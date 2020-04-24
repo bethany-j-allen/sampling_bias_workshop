@@ -143,7 +143,7 @@ install.packages("earth", dependencies=TRUE)
 install.packages("nlme", dependencies=TRUE)
 install.packages("paleoTS", dependencies=TRUE)
 install.packages("plotrix", dependencies=TRUE)
-install.packages("praise, dependencies=TRUE)
+install.packages("praise", dependencies=TRUE)
 
 library("earth")
 library("nlme")
