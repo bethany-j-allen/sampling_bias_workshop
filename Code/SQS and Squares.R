@@ -1,5 +1,5 @@
 ########################################################
-# Bethany's SQS code
+# Bethany's SQS and Squares code
 ########################################################
 
 #Download the packages if you've never used them before
@@ -25,8 +25,6 @@ stages <- c("Wuchiapingian", "Changhsingian", "Induan", "Olenekian", "Anisian", 
 #  Create a vector of stage midpoints
 midpoints <- c(257, 253.2, 251.7, 249.2, 244.6, 239.5, 232)
 
-####################################
-## (1) SQS
 #  This code is set up to give you generic richness, but can be modified fairly easily to give other
 #  taxonomic levels of diversity.
 
@@ -43,6 +41,10 @@ tetrapods <- filter(tetrapods, !is.na(genus))
 #  [Note: doing this in a simple, automated fashion loses lots of occurrences unnecessarily, such as
 #  those dated to a single substage or regional biozone, but is done here for ease]
 tetrapods <- filter(tetrapods, is.na(late_interval)) %>% filter(early_interval %in% stages)
+
+
+####################################
+## (1) SQS
 
 #  Generate a table of sample sizes by substage - this will be used later to evaluate whether our
 #  diversity estimates are overextrapolated (Hsieh et al. 2016, the original iNEXT paper, says that
@@ -109,7 +111,7 @@ for(i in 1:length(quorum_levels)) {
   estD_list[[i]] <- estD
 }
 
-#  [You might get an error at this point warning you about overextrapolation - don't worry about it]
+#  [You might get an error at this point warning you about overextrapolation - we'll fix that shortly]
 
 #  Bind the individual dataframes into one
 estD_list <- bind_rows(estD_list)
@@ -128,4 +130,89 @@ ggplot(estD_list, aes(x = midpoints, y = qD, ymin = qD.LCL, ymax = qD.UCL, group
   geom_line(size = 1) + geom_point() + geom_linerange() +
   scale_colour_manual(values = c("red", "orange", "darkgreen", "blue")) +
   scale_x_reverse(limits = c(260, 227)) + labs(x = "Ma", y = "Interpolated genus diversity", colour = "Quorum level") +
+  geom_vline(aes(xintercept = 259.8), colour = "grey") + #Start of Wuchiapingian
+  geom_vline(aes(xintercept = 254.14), colour = "grey") + #Changhsingian
+  geom_vline(aes(xintercept = 252.17), colour = "grey") + #Induan
+  geom_vline(aes(xintercept = 252.17), linetype = "longdash", colour = "red") + #PT
+  geom_vline(aes(xintercept = 251.2), colour = "grey") + #Olenekian
+  geom_vline(aes(xintercept = 247.2), colour = "grey") + #Anisian
+  geom_vline(aes(xintercept = 242), colour = "grey") + #Ladinian
+  geom_vline(aes(xintercept = 237), colour = "grey") + #Carnian
+  geom_vline(aes(xintercept = 227), colour = "grey") + #End of Carnian
+  theme_classic()
+
+
+####################################
+## (2) Squares
+
+#  Squares also uses strings of the relative abundances of each taxon, but without the string sum
+#  at the front. So this time, if you had a sample containing 1 Aenigmasaurus, 2 Dicynodon,
+#  5 Lystrosaurus, 1 Moschorhinus, and 1 Prolacerta, the string would look like this:
+# Karoo Sample   5 2 1 1 1
+#  The nature of data in the PBDB means that, particularly with vertebrate data, the 'abundance' of a
+#  taxon is usually a count of the number of collections (~ number of localities) in which it is
+#  present, rather than a strict count of the number of individuals.
+
+#  The next bit of code takes occurrences in the format of a standard PBDB download and generates
+#  the necessary abundance strings, with each geologic stage treated as a separate bin.
+
+#  Make an empty list to store the strings in
+stage_freq2 <- list()
+
+#  Loop through each stage
+for (i in 1:length(stages)) {
+  #  Filter the dataset to the desired stage and make a count string
+  f_list2 <- tetrapods %>% filter(early_interval == stages[i]) %>% count(., genus) %>%
+    arrange(desc(n)) %>% select(n)
+  f_list2 <- unlist(f_list2, use.names = F)
+  #  Add the string to the list
+  stage_freq2[[i]] <- f_list2
+}
+
+#  Rename the strings with their stages
+names(stage_freq2) <- stages
+#  Look at the strings to check they are sensible
+glimpse(stage_freq2)
+
+#  Estimate diversity using squares method, based on the equation by Alroy (2018, see Further reading)
+
+#  Make an empty vector to store the squares estimates in
+squares_list <- vector("numeric", length = 0)
+
+#  Loop through each stage
+for(i in 1:length(stage_freq2)) {
+  count_list <- stage_freq2[[i]]
+    # Find number of genera
+    genus_count <- length(count_list)
+    #  Find number of singletons
+    sing_count <- sum(count_list == 1)
+    #  Find number of individuals (sum of string)
+    ind_count <- sum(count_list)
+    #  Find the sum of the string squared (hence the name)
+    sum_nsq <- sum(count_list^2)
+    #  The equation
+    squares <- genus_count + (((sing_count^2)*sum_nsq)/((ind_count^2) - (sing_count*genus_count)))
+    #  Because the equation is a fraction, you can get an estimate of infinity if all taxa are
+    #  singletons - this is a failsafe against that
+    if(squares == Inf){squares <- length(count_list)}
+  #  Add the squares estimate to the end of the vector
+  squares_list <- append(squares_list, squares)
+}
+
+#  Label the squares estimates with the stage midpoints ready for plotting
+to_plot <- data.frame(squares_list, midpoints)
+
+#  Plot your diversity estimates
+ggplot(to_plot, aes(x = midpoints, y = squares_list)) +
+  geom_line(size = 1) + geom_point() +
+  scale_x_reverse(limits = c(260, 227)) + labs(x = "Ma", y = "Squares genus diversity") +
+  geom_vline(aes(xintercept = 259.8), colour = "grey") + #Start of Wuchiapingian
+  geom_vline(aes(xintercept = 254.14), colour = "grey") + #Changhsingian
+  geom_vline(aes(xintercept = 252.17), colour = "grey") + #Induan
+  geom_vline(aes(xintercept = 252.17), linetype = "longdash", colour = "red") + #PT
+  geom_vline(aes(xintercept = 251.2), colour = "grey") + #Olenekian
+  geom_vline(aes(xintercept = 247.2), colour = "grey") + #Anisian
+  geom_vline(aes(xintercept = 242), colour = "grey") + #Ladinian
+  geom_vline(aes(xintercept = 237), colour = "grey") + #Carnian
+  geom_vline(aes(xintercept = 227), colour = "grey") + #End of Carnian
   theme_classic()
