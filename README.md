@@ -1,4 +1,4 @@
-# sampling_bias_workshop
+# Sampling Bias workshop
 A workshop on sampling bias for the Progressive Palaeontology 2020 conference.
 
 # Authors
@@ -33,7 +33,7 @@ Hsieh et al. 2016 (https://doi.org/10.1111/2041-210X.12613): The paper outlining
 
 Starrfelt & Liow 2016 (https://doi.org/10.1098/rstb.2015.0219): The first paper to estimate diversity from the fossil record using TRiPS (True Richness estimated using a Poisson Sampling model).
 
-Close et al. 2017 (https://doi.org/10.1038/ncomms15381) and Close et al. 2020 (https://doi.org/10.1126/science.aay8309): Papers developing methods to produce diversity estimates through time while controlling for spatial sampling bias.
+Close et al. 2017 (https://doi.org/10.1038/ncomms15381), Antell et al. 2020 (https://doi.org/10.1016/j.cub.2019.10.065) and Close et al. 2020 (https://doi.org/10.1126/science.aay8309): Papers developing methods to produce diversity estimates through time while controlling for spatial sampling bias.
 
 Alroy 2018 (https://doi.org/10.1111/ele.13152): The paper which outlines the squares extrapolator we implement. It's based on the ideas outlined in Colwell and Coddington (1994; see above).
 
