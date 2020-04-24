@@ -1,23 +1,34 @@
 ########################################################
-# Bethany' code
+# Bethany's SQS code
 ########################################################
 
-#Load packages
+#Download the packages if you've never used them before
+install.packages("tidyverse", dependencies = T)
+install.packages("iNEXT", dependencies = T)
+
+#  Load packages
 library(tidyverse)
 library(iNEXT)
 
-tetrapods <- read_csv("data/tetrapods.csv")
+#  Use the PBDB API to download a dataset of tetrapods from the Wuchiapingian (early Late Permian) to
+#  Carnian (early Late Triassic)
+tetrapods <- utils::read.csv("https://paleobiodb.org/data1.2/occs/list.csv?base_name=Tetrapoda&interval=Wuchiapingian,Carnian&show=coords,paleoloc,class&limit=all", header = T, na.strings ="")
+#  Trim to the columns with information we want
+tetrapods <- tetrapods[, c("occurrence_no", "collection_no", "phylum", "class", "order",
+                 "family", "genus", "accepted_name", "early_interval", "late_interval", "max_ma",
+                 "min_ma", "lng", "lat", "paleolng", "paleolat")]
 
-#Create a vector giving the chronological order of substages
-substages <- c("Wuchiapingian", "Changhsingian", "Griesbachian", "Smithian", "Spathian",
-               "Aegean-Bithynian", "Pelsonian-Illyrian", "Fassanian", "Longobardian", "Julian",
-               "Tuvalian")
+#  Create a vector giving the chronological order of stages
+stages <- c("Wuchiapingian", "Changhsingian", "Induan", "Olenekian", "Anisian", "Ladinian",
+               "Carnian")
 
-#Create a vector of substage midpoints
-midpoints <- c(256.6, 253, 251.7, 250.2, 248.2, 245.9, 243.3, 240.8, 238.3, 234.5, 229.5)
+#  Create a vector of stage midpoints
+midpoints <- c(257, 253.2, 251.7, 249.2, 244.6, 239.5, 232)
 
 ####################################
 ## (1) SQS
+#  This code is set up to give you generic richness, but can be modified fairly easily to give other
+#  taxonomic levels of diversity.
 
 #  When taxa are made synonymous in the PBDB, they are retained as separate entries with the same
 #  name. If you want to know diversity, this is an issue, as it articifially inflates your estimate.
@@ -25,15 +36,20 @@ midpoints <- c(256.6, 253, 251.7, 250.2, 248.2, 245.9, 243.3, 240.8, 238.3, 234.
 #  accepted name.
 tetrapods <- distinct(tetrapods, accepted_name, collection_no, .keep_all = T)
 
-#  Remove occurrences which aren't dated to substage level
-tetrapods <- tetrapods %>% filter(!is.na(substage_assignment))
+#  Retain only occurrences which are identified to genus or species level
+tetrapods <- filter(tetrapods, !is.na(genus))
+
+#  Retain occurences which are dated to a single stage
+#  [Note: doing this in a simple, automated fashion loses lots of occurrences unnecessarily, such as
+#  those dated to a single substage or regional biozone, but is done here for ease]
+tetrapods <- filter(tetrapods, is.na(late_interval)) %>% filter(early_interval %in% stages)
 
 #  Generate a table of sample sizes by substage - this will be used later to evaluate whether our
 #  diversity estimates are overextrapolated (Hsieh et al. 2016, the original iNEXT paper, says that
 #  an estimate of more than 2-3x your sample size should be considered unreliable)
-totals <- count(tetrapods, substage_assignment)
+totals <- count(tetrapods, early_interval)
 #  Order the substages in the table chronologically
-totals <- totals[match(substages, totals$substage_assignment),]
+totals <- totals[match(stages, totals$early_interval),]
 
 #  iNEXT requires input data in a very specific format. Each 'bin' that you want to sample needs a
 #  string of the relative abundances of each taxon, with the first number in the string being the total
@@ -51,10 +67,10 @@ totals <- totals[match(substages, totals$substage_assignment),]
 stage_freq <- list()
 
 #  Loop through each stage
-for (i in 1:length(substages)) {
+for (i in 1:length(stages)) {
   #  Filter the dataset to the desired stage, make a count string, and start with the string total
-  f_list <- totals %>% filter(substage_assignment == substages[i]) %>%
-    count(., accepted_name) %>% arrange(desc(n)) %>% add_row(n = sum(.$n), .before = 1) %>%
+  f_list <- tetrapods %>% filter(early_interval == stages[i]) %>%
+    count(., genus) %>% arrange(desc(n)) %>% add_row(n = sum(.$n), .before = 1) %>%
     select(n)
   f_list <- unlist(f_list, use.names = F)
   #  If there are less than 3 taxa in the bin, make the string NA
@@ -63,11 +79,11 @@ for (i in 1:length(substages)) {
   stage_freq[[i]] <- f_list
 }
 #  Rename the strings with their stages
-names(stage_freq) <- substages
+names(stage_freq) <- stages
 #  Look at the strings to check they are sensible
 glimpse(stage_freq)
 
-#  Filter out the NA strings (stages with less than 3 taxat)
+#  Filter out the NA strings (bins with less than 3 taxa) if necessary
 stage_freq <- stage_freq[!is.na(stage_freq)]
 
 #  [This next bit of the code is based on Dunne et al. 2018 (https://doi.org/10.1098/rspb.2017.2730)]
@@ -78,36 +94,38 @@ quorum_levels <- round(seq(from = 0.4, to = 0.7, by = 0.1), 1)
 
 #  Estimate your diversity levels using estimateD in iNEXT
 #  Make an empty list to store the outputs in
-t.estD_list <- list()
+estD_list <- list()
 
 #  Loop through each desired quorum level
 for(i in 1:length(quorum_levels)) {
-  t.estD <- estimateD(stage_freq, datatype = "incidence_freq", base = "coverage", level = quorum_levels[i])
+  estD <- estimateD(stage_freq, datatype = "incidence_freq", base = "coverage", level = quorum_levels[i])
   #  Filter the iNEXT output to the species diversity estimates
-  t.estD <- filter(t.estD, order == 0)
+  estD <- filter(estD, order == 0)
   #  Label with the relevant quorum level, sample size and stage midpoint age
-  t.estD$quorum_level <- quorum_levels[i]
-  t.estD$reference_t <- terres_totals$n
-  t.estD$midpoints <- midpoints[match(names(terres_substage_freq), substages)]
+  estD$quorum_level <- quorum_levels[i]
+  estD$reference_t <- totals$n
+  estD$midpoints <- midpoints[match(names(stage_freq), stages)]
   #  Add the output to the list
-  t.estD_list[[i]] <- t.estD
+  estD_list[[i]] <- estD
 }
 
+#  [You might get an error at this point warning you about overextrapolation - don't worry about it]
+
 #  Bind the individual dataframes into one
-t.estD_list <- bind_rows(t.estD_list)
+estD_list <- bind_rows(estD_list)
 
 #  Remove values where estimated diversity is more than three times the sample size (see earlier)
-t.estD_list[which(t.estD_list$t >= 3 * t.estD_list$reference_t), c("qD", "qD.LCL", "qD.UCL")] <- rep(NA, 3)
+estD_list[which(estD_list$t >= 3 * estD_list$reference_t), c("qD", "qD.LCL", "qD.UCL")] <- rep(NA, 3)
 
 #  Take a look at the list to check it looks sensible
-View(t.estD_list)
+View(estD_list)
 
 #  Make quorum level a factor (this helps with plotting)
-t.estD_list$quorum_level <- as.factor(t.estD_list$quorum_level)
+estD_list$quorum_level <- as.factor(estD_list$quorum_level)
 
 #  Plot your diversity estimates - the error bars are 95% confidence intervals
-ggplot(t.estD_list, aes(x = midpoints, y = qD, ymin = qD.LCL, ymax = qD.UCL, group = quorum_level, colour = quorum_level)) +
+ggplot(estD_list, aes(x = midpoints, y = qD, ymin = qD.LCL, ymax = qD.UCL, group = quorum_level, colour = quorum_level)) +
   geom_line(size = 1) + geom_point() + geom_linerange() +
-  scale_colour_manual(values = c("chartreuse1", "chartreuse2", "chartreuse3", "chartreuse4")) +
-  scale_x_reverse(limits = c(260, 227)) + labs(x = "Ma", y = "Interpolated diversity", colour = "Quorum level") +
+  scale_colour_manual(values = c("red", "orange", "darkgreen", "blue")) +
+  scale_x_reverse(limits = c(260, 227)) + labs(x = "Ma", y = "Interpolated genus diversity", colour = "Quorum level") +
   theme_classic()
