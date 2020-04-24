@@ -2,7 +2,7 @@
 A workshop on sampling bias for the Progressive Palaeontology 2020 conference.
 
 # Authors
-Bethany ALlen, Alex Dunhill and Graeme Lloyd
+Bethany Allen, Alex Dunhill and Graeme Lloyd
 
 # Resources
 Link to the Google Doc
@@ -41,4 +41,4 @@ Close et al. 2018 (https://doi.org/10.1111/2041-210X.12987) and Alroy 2020 (http
 
 Dunhill et al. 2018 (https://doi.org/10.1111/pala.12331): A simulation-based study showing that geological sampling proxies cannot be used to try and 'correct' for sampling bias when estimating diversity.
 
-Kocsis et al. 2019 (https://doi.org/10.1111/2041-210X.13161): The paper outlining divDyn, a comprehensive suite of functions for analysis data in the Paleobiology Database.
+Kocsis et al. 2019 (https://doi.org/10.1111/2041-210X.13161): The paper outlining divDyn, an R package containing a comprehensive suite of functions for analysing data in the Paleobiology Database.
