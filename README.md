@@ -13,9 +13,13 @@ https://drive.google.com/file/d/1VfbfV1gsiKUwOQUrPGr3iGas1O89QvwC/view
 
 # Getting started
 This workshop is comprised of videos, annotated slides and practicals in R, a statistical programming language. In order to run the practicals, you will need to download and install R onto your computer. You may also want to install R Studio, a wrapper for R which organises your inputs and outputs into easy-to-see panels.
+
 Download R by choosing your local CRAN mirror here: https://cran.r-project.org/mirrors.html
+
 Download R Studio here: https://rstudio.com/products/rstudio/download/#download
+
 To access the workshop files, click the green "Clone or download" button at the top right of this page, and select "Download ZIP". Once downloaded, open the folder by right-clicking and selecting "Extract all", saving the files somewhere you can access them - you will have to tell R where the files are when you start the practicals.
+
 If you have your own GitHub account, you may want to keep your own copy of this repository by 'forking' it, again via the relevant button at the top right of this page.
 
 # Further reading
