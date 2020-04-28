@@ -11,6 +11,9 @@ https://docs.google.com/document/d/1qcvRaOIkBRDdG3dvco6amFj6tyhLrb1_8u7CPC7pZJM/
 Link to Alex's video
 https://drive.google.com/file/d/1VfbfV1gsiKUwOQUrPGr3iGas1O89QvwC/view
 
+Link to Graeme's slides
+https://docs.google.com/presentation/d/1gBbQTGRhejkAmWhyMDbV42IkM5-6k9YpYvUPJXUKaPE/edit#slide=id.p
+
 # Getting started
 This workshop is comprised of videos, annotated slides and practicals in R, a statistical programming language. In order to run the practicals, you will need to download and install R onto your computer. You may also want to install R Studio, a wrapper for R which organises your inputs and outputs into easy-to-see panels.
 
