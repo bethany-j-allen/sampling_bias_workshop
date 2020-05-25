@@ -15,7 +15,7 @@ Link to Graeme's slides
 https://docs.google.com/presentation/d/1gBbQTGRhejkAmWhyMDbV42IkM5-6k9YpYvUPJXUKaPE/edit#slide=id.p
 
 # Getting started
-This workshop is comprised of videos, annotated slides and practicals in R, a statistical programming language. In order to run the practicals, you will need to download and install R onto your computer. You may also want to install R Studio, a wrapper for R which organises your inputs and outputs into easy-to-see panels.
+This workshop is comprised of videos and practicals in R, a statistical programming language. In order to run the practicals, you will need to download and install R onto your computer. You may also want to install R Studio, a wrapper for R which organises your inputs and outputs into easy-to-see panels.
 
 Download R by choosing your local CRAN mirror here: https://cran.r-project.org/mirrors.html
 
@@ -46,7 +46,7 @@ Hsieh et al. 2016 (https://doi.org/10.1111/2041-210X.12613): The paper outlining
 
 Starrfelt & Liow 2016 (https://doi.org/10.1098/rstb.2015.0219): The first paper to estimate diversity from the fossil record using TRiPS (True Richness estimated using a Poisson Sampling model).
 
-Close et al. 2017 (https://doi.org/10.1038/ncomms15381), Antell et al. 2020 (https://doi.org/10.1016/j.cub.2019.10.065) and Close et al. 2020 (https://doi.org/10.1126/science.aay8309): Papers developing methods to produce diversity estimates through time while controlling for spatial sampling bias.
+Close et al. 2017 (https://doi.org/10.1038/ncomms15381), Reddin et al. 2018 (https://doi.org/10.1111/geb.12732), Antell et al. 2020 (https://doi.org/10.1016/j.cub.2019.10.065) and Close et al. 2020 (https://doi.org/10.1126/science.aay8309): Examples of papers developing methods to produce diversity estimates through time while controlling for spatial sampling bias.
 
 Alroy 2018 (https://doi.org/10.1111/ele.13152): The paper which outlines the squares extrapolator we implement. It's based on the ideas outlined in Colwell and Coddington (1994; see above).
 
