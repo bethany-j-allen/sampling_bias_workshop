@@ -8,9 +8,6 @@ Bethany Allen, Alex Dunhill and Graeme Lloyd
 Link to the Google Doc
 https://docs.google.com/document/d/1qcvRaOIkBRDdG3dvco6amFj6tyhLrb1_8u7CPC7pZJM/edit?ts=5e9d71cd
 
-Link to Alex's video
-https://drive.google.com/file/d/1VfbfV1gsiKUwOQUrPGr3iGas1O89QvwC/view
-
 Link to Graeme's slides
 https://docs.google.com/presentation/d/1gBbQTGRhejkAmWhyMDbV42IkM5-6k9YpYvUPJXUKaPE/edit#slide=id.p
 
@@ -24,6 +21,26 @@ Download R Studio here: https://rstudio.com/products/rstudio/download/#download
 To access the workshop files, click the green "Clone or download" button at the top right of this page, and select "Download ZIP". Once downloaded, open the folder by right-clicking and selecting "Extract all", saving the files somewhere you can access them - you will have to tell R where the files are when you start the practicals.
 
 If you have your own GitHub account, you may want to keep your own copy of this repository by 'forking' it, again via the relevant button at the top right of this page.
+
+# Accessing the videos
+There are two video lectures associated with the workshop. We advise that you watch the videos first, as these will introduce you to the key concepts.
+
+The first is an introduction to the sources of sampling bias in the fossil record, given by Dr. Alex Dunhill, and can be found here: https://www.youtube.com/watch?v=smfm6mR-obE (duration: 45 mins)
+
+The second is a discussion of what sampling bias means for palaeontologists who want to conduct quantitative analysis of the fossil record, given by Dr. Graeme Lloyd, and can be found here: 
+
+# Running the practicals
+To run the practicals, start R (or RStudio, if you have installed it). Using 'Open' at the top left of either program, open the script you want to run; they are numbered in their recommended order.
+
+You will then need to tell R where to find your files by setting the working directory. This is a file path to the folder where you downloaded the workshop materials. The function is
+
+setwd("[write your file path here]")
+
+If you don't get an error message, it has probably worked (this is true for using R generally). In this case, you're good to go! If not, try again, checking for spelling mistakes and consistent capitalisation.
+
+Start running the script line-by-line in the console. A # indicates a comment - that's for you to read, not the computer. We have tried to be extensive in our explanations of what is happening in the code to help you understand the processes.
+
+We will be holding a live Q&A session as part of the conference to answer any questions - please see the abstract booklet for more information.
 
 # Further reading
 Raup 1972 (www.jstor.org/stable/1734207): One of the most famous papers in macroevolution, this is the first attempt at producing a diversity curve for the whole Phanerozoic. This paper is where a lot of core ideas relating to models and subsampling were laid out.
