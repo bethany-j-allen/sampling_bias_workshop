@@ -1,37 +1,56 @@
 ########################################################
-# Quality of the fossil record practical
-# AMD
+# Quality of the fossil record
+# AMD, modified by BJA
 # 23rd October 2019
 # Phanerzoic record of bivalves
 ########################################################
 
-## loading data
-
 # set working directory
-setwd("M://r stats practicals//")
+setwd("#####")
 
-# load data file
-palaeo<-read.csv("palaeo_data1.csv")
+# download datasets - we are looking at bivalve diversity through the Phanerozoic
+#  (Ordovician - Pliocene)
 
-# check data
-palaeo
-head(palaeo)
-summary(palaeo)
+# download diversity by time bin
+bin_diversity <- utils::read.csv("https://paleobiodb.org/data1.2/occs/diversity.csv?base_name=Bivalvia&count=genera&interval=Ordovician,Pliocene", header = T)
+
+# This type of download gives you abundance and richness for each stage in your sampled time interval
+# Take a look at the data using
+head(bin_diversity)
+
+# You can also look at summary statistics using
+summary(bin_diversity)
+
+# download genus ranges
+genus_ranges <- utils::read.csv("https://paleobiodb.org/data1.2/occs/taxa.csv?base_name=Bivalvia&rank=genus&interval=Ordovician,Pliocene&show=app", header = T)
+
+# This type of download gives you a list of genera, with their first and last appearances
+# Take a look at the data using
+head(genus_ranges)
+
+# You can see summary statistics for this too, using
+summary(genus_ranges)
+
+# Save these files if you want to - it's good practice if you want to use PBDB data for research to
+#  keep a copy of the original downloads
+write.csv(bin_diversity, file = "Bivalves_through_time.csv")
+write.csv(genus_ranges, file = "Bivalve_genus_ranges.csv")
+
+# You can read these in at a later date using
+bin_diversity <- read.csv("Bivalves_through_time.csv", header = T)
+genus_ranges <- read.csv("Bivalve_genus_ranges.csv", header = T)
 
 ####################################
 ## (1) plotting data
 
 # plotting bivalve richness and ranged diversity through time
-# export as pdf
-pdf("bivalve diversity.pdf", height=5, width=7)
-	plot(palaeo$age, palaeo$richness,
+plot(palaeo$age, palaeo$richness,
 		xlim=c(500,0), ylim=c(0,510), xlab="Millions of years", ylab="generic richness",
 			type="o", lty=1, lwd=2, pch=1, col=1)
-	points(palaeo$age, palaeo$ranged, 
+points(palaeo$age, palaeo$ranged, 
 		type="o", lty=1, lwd=2, pch=2, col=2) 		
-	legend("topleft", c("sampled bivalve richness", "ranged-through bivalve richness"),
+legend("topleft", c("sampled bivalve richness", "ranged-through bivalve richness"),
 		lty=1, lwd=2, pch=1:2, col=1:2)
-dev.off()
 
 ####################################
 ## (2) Calculating in R
