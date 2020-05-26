@@ -21,6 +21,10 @@ head(bin_diversity)
 # You can also look at summary statistics using
 summary(bin_diversity)
 
+# Let's add columns with the stage durations and midpoints to help us plot the data later
+bin_diversity$duration <- bin_diversity$max_ma - bin_diversity$min_ma
+bin_diversity$midpoint <- bin_diversity$min_ma + (bin_diversity$duration/2)
+
 # download genus ranges
 genus_ranges <- utils::read.csv("https://paleobiodb.org/data1.2/occs/taxa.csv?base_name=Bivalvia&rank=genus&interval=Ordovician,Pliocene&show=app", header = T)
 
@@ -44,7 +48,7 @@ genus_ranges <- read.csv("Bivalve_genus_ranges.csv", header = T)
 ## (1) plotting data
 
 # plotting bivalve richness and ranged diversity through time
-plot(palaeo$age, palaeo$richness,
+plot(bin_diversity$age, palaeo$richness,
 		xlim=c(500,0), ylim=c(0,510), xlab="Millions of years", ylab="generic richness",
 			type="o", lty=1, lwd=2, pch=1, col=1)
 points(palaeo$age, palaeo$ranged, 
