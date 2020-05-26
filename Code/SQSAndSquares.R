@@ -2,14 +2,6 @@
 # Bethany's SQS and Squares code
 ########################################################
 
-#Download the packages if you've never used them before
-install.packages("tidyverse", dependencies = T)
-install.packages("iNEXT", dependencies = T)
-
-#  Load packages
-library(tidyverse)
-library(iNEXT)
-
 #  Use the PBDB API to download a dataset of tetrapods from the Wuchiapingian (early Late Permian) to
 #  Carnian (early Late Triassic)
 tetrapods <- utils::read.csv("https://paleobiodb.org/data1.2/occs/list.csv?base_name=Tetrapoda&interval=Wuchiapingian,Carnian&show=coords,paleoloc,class&limit=all", header = T, na.strings ="")
