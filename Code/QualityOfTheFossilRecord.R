@@ -137,19 +137,19 @@ cor.test(palaeo$collections, palaeo$richness, method="spearman")
 
 source("http://www.graemetlloyd.com/pubdata/functions_2.r") 
 
-# installing and loading packages
+# installing and loading packages [moved to PBDB script]
 
-install.packages("earth", dependencies=TRUE)
-install.packages("nlme", dependencies=TRUE)
-install.packages("paleoTS", dependencies=TRUE)
-install.packages("plotrix", dependencies=TRUE)
-install.packages("praise", dependencies=TRUE)
+#install.packages("earth", dependencies=TRUE)
+#install.packages("nlme", dependencies=TRUE)
+#install.packages("paleoTS", dependencies=TRUE)
+#install.packages("plotrix", dependencies=TRUE)
+#install.packages("praise", dependencies=TRUE)
 
-library("earth")
-library("nlme")
-library("paleoTS")
-library("plotrix")
-library("praise")
+#library("earth")
+#library("nlme")
+#library("paleoTS")
+#library("plotrix")
+#library("praise")
 
 # renaming variable to fit the model parameters
 
