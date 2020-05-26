@@ -9,9 +9,10 @@ StopInterval <- " " #write the end time interval
 StartInterval <- gsub(" ", "%20", StartInterval)
 StopInterval <- gsub(" ", "%20", StopInterval)
 Taxa <- paste(Taxa, collapse = ",")
+<<<<<<< HEAD
 URL <- paste0("https://paleobiodb.org/data1.2/occs/list.csv?base_name=",
 Taxa, "&interval=", StartInterval, ",", StopInterval,
-"&show=coords,paleoloc,class&limit=all")
+  "&show=coords,paleoloc,class&limit=all")
 File <- utils::read.csv(URL, header = TRUE)
 
 
@@ -72,3 +73,9 @@ utils::read.csv("https://paleobiodb.org/data1.2/occs/list.csv?taxon_id=34920&int
 
 
 
+=======
+URL <- paste0("https://paleobiodb.org/data1.2/occs/list.csv?base_name=", 
+              Taxa, "&interval=", StartInterval, ",", StopInterval, 
+              "&show=coords,paleoloc,class&limit=all")
+File <- utils::read.csv(URL, header = TRUE)
+>>>>>>> 85e37b391e6aa960604e36e7c71bff1ad9e7a435
