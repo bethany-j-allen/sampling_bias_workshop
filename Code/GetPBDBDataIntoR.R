@@ -1,23 +1,3 @@
-# TURN THIS INTO A SCRIPT JUST ON GETTING DATA INTO R AND FORMATTING IT CORRECTLY
-
-#Extended download function from velociraptr
-
-Taxa <- " " #write the taxon name you want to search
-StartInterval <- " " #write the start time interval
-StopInterval <- " " #write the end time interval
-
-StartInterval <- gsub(" ", "%20", StartInterval)
-StopInterval <- gsub(" ", "%20", StopInterval)
-Taxa <- paste(Taxa, collapse = ",")
-<<<<<<< HEAD
-URL <- paste0("https://paleobiodb.org/data1.2/occs/list.csv?base_name=",
-Taxa, "&interval=", StartInterval, ",", StopInterval,
-  "&show=coords,paleoloc,class&limit=all")
-File <- utils::read.csv(URL, header = TRUE)
-
-
-
-
 ################################################################################
 #                                                                              #
 #                SCRIPT I - SETUP AND GETTING PBDB DATA INTO R                 #
@@ -32,19 +12,42 @@ File <- utils::read.csv(URL, header = TRUE)
 
 # First up we need to install the packages we will want to use today:
 PackageBundle <- c("devtools", "earth", "nlme", "paleoTS", "plotrix",
-  "praise", "velociraptr")
+"praise", "velociraptr")
 install.packages(PackageBundle, dependencies = TRUE)
 devtools::install_github("graemetlloyd/metatree")
 
 # And load these into memory:
 for(pkg in c(PackageBundle, "metatree")) try(library(pkg,
-  character.only = TRUE), silent = TRUE)
+character.only = TRUE), silent = TRUE)
 
 
 
 # If you are familiar with R then you will know the hardest part in using a
 # package or script is to get your data into R in the format required by the
 # functions you want to use.
+
+
+
+
+#Extended download function from velociraptr
+
+Taxa <- " " #write the taxon name you want to search
+StartInterval <- " " #write the start time interval
+StopInterval <- " " #write the end time interval
+
+StartInterval <- gsub(" ", "%20", StartInterval)
+StopInterval <- gsub(" ", "%20", StopInterval)
+Taxa <- paste(Taxa, collapse = ",")
+URL <- paste0("https://paleobiodb.org/data1.2/occs/list.csv?base_name=",
+Taxa, "&interval=", StartInterval, ",", StopInterval,
+  "&show=coords,paleoloc,class&limit=all")
+File <- utils::read.csv(URL, header = TRUE)
+
+
+
+
+
+
 
 
 
@@ -67,15 +70,3 @@ utils::read.csv("https://paleobiodb.org/data1.2/occs/list.csv?taxon_id=34920&int
 # Oh dear oh dear...
 
 
-
-
-
-
-
-
-=======
-URL <- paste0("https://paleobiodb.org/data1.2/occs/list.csv?base_name=", 
-              Taxa, "&interval=", StartInterval, ",", StopInterval, 
-              "&show=coords,paleoloc,class&limit=all")
-File <- utils::read.csv(URL, header = TRUE)
->>>>>>> 85e37b391e6aa960604e36e7c71bff1ad9e7a435
