@@ -45,72 +45,37 @@ bin_diversity <- read.csv("Bivalves_through_time.csv", header = T)
 genus_ranges <- read.csv("Bivalve_genus_ranges.csv", header = T)
 
 ####################################
-## (1) plotting data
+# Now that we have prepared the data, we can produce exploratory graphs to see what the fossil record
+#  of bivalves in the PBDB looks like
 
-# plotting bivalve richness and ranged diversity through time
-plot(bin_diversity$age, palaeo$richness,
-		xlim=c(500,0), ylim=c(0,510), xlab="Millions of years", ylab="generic richness",
+## (1) Occurrences through time
+# This is simply the number of bivalve occurrences per stage
+
+plot(bin_diversity$midpoint, bin_diversity$n_occs,
+		xlim=c(500,0), xlab="Millions of years", ylab="No. of occurrences",
 			type="o", lty=1, lwd=2, pch=1, col=1)
+
+## (2) Generic diversity through time
+# This is the number of bivalve genera observed per stage
+# This is a type of 'sampled-in-bin' metric - there is no correction for ghost ranges
+
+plot(bin_diversity$midpoint, bin_diversity$sampled_in_bin,
+     xlim=c(500,0), xlab="Millions of years", ylab="No. of genera",
+     type="o", lty=1, lwd=2, pch=1, col=1)
+
+
 points(palaeo$age, palaeo$ranged, 
 		type="o", lty=1, lwd=2, pch=2, col=2) 		
 legend("topleft", c("sampled bivalve richness", "ranged-through bivalve richness"),
 		lty=1, lwd=2, pch=1:2, col=1:2)
 
-####################################
-## (2) Calculating in R
+## (x) Generic evenness
+# This is the number of bivalve occurrences per genus
+# A huge range, with some genera very common, and others very rare
 
-# writing a function for SCM
-
-SCM = function(a,b){
-	SCM1 = 100*(a/(a+(b-a)))
-	return(SCM1)
-}
-
-calculating SCM for bivalve data
-SCMbiv<-SCM(palaeo$richness, palaeo$ranged)
-# check results
-SCMbiv
-
-# plotting SCM and analysing gaps
-
-# binding age and SCM together as a data set
-
-SCMtime<-cbind(palaeo$age, SCMbiv)
-
-# plotting
-
-# format plot as before and export as a pdf
-
-pdf("bivalve SCM.pdf", height=5, width=7)
-	plot(SCMtime[,1], SCMbiv,
-		xlim=c(500,0), ylim=c(0,100), xlab="Millions of years", ylab="SCM",
-			type="o", lty=1, lwd=2, pch=1, col=1)
-	legend("bottomright", c("bivalve SCM"),
-		lty=1, lwd=2, pch=1, col=1)
-dev.off()
+hist(genus_ranges$n_occs, breaks = 20, xlab = "No. of occurrences", ylab = "No. of genera")
 
 
-####################################
-## (3) plotting subsampled data
-
-# plot and export subsampled data plot
-pdf("subsampled bivalve richness.pdf", height=5, width=7)
-	plot(palaeo$age, palaeo$subsampled,
-		xlim=c(500,0), xlab="Millions of years", ylab="subsampled richness",
-			type="o", lty=1, lwd=2, pch=1)
-	legend("topleft", "bivalve richness at n=250 subsamples", lty=1, lwd=2, pch=1)
-dev.off()
-
-# comparing subsampled with raw richness
-pdf("subsampled and raw bivalve richness.pdf", height=5, width=7)
-	plot(palaeo$age, palaeo$subsampled,
-		xlim=c(500,0), ylim=c(0,510), xlab="Millions of years", ylab="subsampled richness", 
-			type="o", lty=1, lwd=2, pch=1, col=1)
-	points(palaeo$age, palaeo$richness, 
-		type="o", lty=1, lwd=2, pch=2, col=2)
-	legend("topleft", c("bivalve richness at n=250 subsamples", "raw bivalve richness"),
-		lty=1, lwd=2, pch=1:2, col=1:2)
-dev.off()
 
 ####################################
 ## (4) plotting sampling proxies
@@ -152,58 +117,5 @@ par(mfrow=c(1,1))
 # perform appropriate tests
 cor.test(palaeo$collections, palaeo$richness, method="spearman")
 
-####################################
-## residual modelling
-# using collections as proxy and richness as diversity
 
-# sourcing code from the web
-
-source("http://www.graemetlloyd.com/pubdata/functions_2.r") 
-
-# installing and loading packages [moved to PBDB script]
-
-#install.packages("earth", dependencies=TRUE)
-#install.packages("nlme", dependencies=TRUE)
-#install.packages("paleoTS", dependencies=TRUE)
-#install.packages("plotrix", dependencies=TRUE)
-#install.packages("praise", dependencies=TRUE)
-
-#library("earth")
-#library("nlme")
-#library("paleoTS")
-#library("plotrix")
-#library("praise")
-
-# renaming variable to fit the model parameters
-
-time<-palaeo$age
-div<-palaeo$richness
-proxy<-palaeo$collections
-
-# run the model code
-
-results<-rockmodel.predictCI(proxy,div) 
-
-# plot modelled diversity
-
-pdf("raw and residual bivalve diversity.pdf", height=12, width=12)
-par(mfrow=c(2,1))
-plot(palaeo$age, palaeo$richness,
-		xlim=c(500,0), ylim=c(0,510), xlab="Millions of years", ylab="generic richness",
-			type="o", lty=1, lwd=2, pch=1, col=1)
-	points(palaeo$age, palaeo$ranged, 
-		type="o", lty=1, lwd=2, pch=2, col=2) 		
-	legend("topleft", c("sampled bivalve richness", "ranged-through bivalve richness"),
-		lty=1, lwd=2, pch=1:2, col=1:2)
-plot(time,div-results$predicted,type="l",xlim=c(max(time),min(time)),
-        xlab="Time (Ma)",ylab="Model Detrended Taxonomic Richness")
-    polygon(x=c(time,rev(time)),y=c(div-results$predicted,
-        rep(0,length(time))),col="grey",border=0)
-    points(time,div-results$predicted,type="l")
-    lines(time,rep(0,length(time)))
-    lines(time,results$seupperCI-results$predicted,lty=2)
-    lines(time,results$selowerCI-results$predicted,lty=2)
-    lines(time,results$sdupperCI-results$predicted,lty=4)
-    lines(time,results$sdlowerCI-results$predicted,lty=4)
-dev.off()
 
