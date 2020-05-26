@@ -11,10 +11,11 @@
 # 3. Get some example data into R for use in the later scripts.
 
 # First up we need to install the packages we will want to use today:
-PackageBundle <- c("devtools", "earth", "nlme", "paleoTS", "plotrix",
-"praise", "velociraptr")
+PackageBundle <- c("devtools", "earth", "iNEXT", "nlme", "paleoTS", "plotrix",
+  "praise", "tidyverse", "velociraptr")
 install.packages(PackageBundle, dependencies = TRUE)
 devtools::install_github("graemetlloyd/metatree")
+
 
 # And load these into memory:
 for(pkg in c(PackageBundle, "metatree")) try(library(pkg,
