@@ -73,4 +73,6 @@ Dunne et al. 2018 (https://doi.org/10.1098/rspb.2017.2730): A nice example of ap
 
 Dunhill et al. 2018 (https://doi.org/10.1111/pala.12331): A simulation-based study showing that geological sampling proxies cannot be used to try and 'correct' for sampling bias when estimating diversity.
 
+Stadler et al. 2018 (https://doi.org/10.1016/j.jtbi.2018.03.005), Hopkins et al. 2018 (https://doi.org/10.1017/pab.2018.27) and Warnock et al. 2020 (https://doi.org/10.1017/pab.2020.12): Papers considering the role of sampling on our understanding of phylogenies and evolutionary processes, introducing and advocating for use of the fossilised birth-death model.
+
 Kocsis et al. 2019 (https://doi.org/10.1111/2041-210X.13161): The paper outlining divDyn, an R package containing a comprehensive suite of functions for analysing data in the Paleobiology Database.
