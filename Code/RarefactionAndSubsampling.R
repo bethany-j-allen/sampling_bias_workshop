@@ -1,4 +1,31 @@
-# HEADER!!!
+################################################################################
+#                                                                              #
+#                   SCRIPT II - RAREFACTION AND BOOTSTRAPPING                  #
+#                                                                              #
+################################################################################
+
+# SCRIPT AIMS:
+#
+# 1. Install and load the packages required for the workshop.
+# 2. Introduce the PBDB and its' API.
+# 3. Get some example data into R for use in the later scripts.
+
+# Load packages:
+PackageBundle <- c("devtools", "earth", "iNEXT", "metatree", "nlme", "paleoTS",
+  "plotrix", "praise", "tidyverse", "velociraptr")
+for(pkg in c(PackageBundle, "metatree")) try(library(pkg,
+  character.only = TRUE), silent = TRUE)
+
+# Read the data into R:
+RawData <- utils::read.csv("https://paleobiodb.org/data1.2/occs/list.csv?base_name=Brachiopoda&interval=Capitanian,Anisian&show=coords,paleoloc,class", header = TRUE, stringsAsFactors = FALSE)
+
+
+
+unique(RawData[unique(RawData[, "accepted_rank"]) == "species", "accepted_name"])
+
+
+
+
 
 # Get Jurassic and Cretaceous dinosaur occurrences from the PBDB:
 JurassicDinosaurs <- metatree::PaleobiologyDBOccurrenceQuerier(unname(unlist(lapply(apply(metatree::PaleobiologyDBChildFinder(taxon_names = "Dinosauria", interval = c("Jurassic", "Jurassic"), returnrank = "3")[, 1:2], 1, list), function(x) {x <- unlist(x); gsub("txn:|var:", "", x[!is.na(x)][1])}))))
