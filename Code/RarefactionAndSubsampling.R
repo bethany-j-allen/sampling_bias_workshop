@@ -6,22 +6,36 @@
 
 # SCRIPT AIMS:
 #
-# 1. Install and load the packages required for the workshop.
-# 2. Introduce the PBDB and its' API.
-# 3. Get some example data into R for use in the later scripts.
+# 1. Introduce basics of resampling.
+# 2. Learn hot to rarefy and bootstrap data in R.
+# 3. Generate rarefied and bootstrapped richness estimates.
 
-# Load packages:
+# Make sure the packages are loaded into memory...:
 PackageBundle <- c("devtools", "earth", "iNEXT", "metatree", "nlme", "paleoTS",
   "plotrix", "praise", "tidyverse", "velociraptr")
 for(pkg in c(PackageBundle, "metatree")) try(library(pkg,
   character.only = TRUE), silent = TRUE)
 
-# Read the data into R:
-RawData <- utils::read.csv("https://paleobiodb.org/data1.2/occs/list.csv?base_name=Brachiopoda&interval=Capitanian,Anisian&show=coords,paleoloc,class", header = TRUE, stringsAsFactors = FALSE)
+# ...alongside the data the data into R:
+RawData <- utils::read.csv("https://paleobiodb.org/data1.2/occs/list.csv?base_name=Brachiopoda&interval=Capitanian,Anisian&show=coords,paleoloc,class",
+  header = TRUE, stringsAsFactors = FALSE)
+RawData <- RawData[, c("occurrence_no", "collection_no", "phylum", "class",
+  "order", "family", "genus", "accepted_name", "early_interval",
+  "late_interval", "max_ma", "min_ma", "lng", "lat", "paleolng",
+  "paleolat", "identified_rank")]
+RawData <- dplyr::filter(RawData, nchar(genus) > 0)
+RawData <- dplyr::distinct(RawData, accepted_name, collection_no,
+  .keep_all = TRUE)
+StageNames <- c("Capitanian", "Wuchiapingian", "Changhsingian", "Induan",
+  "Olenekian", "Anisian")
+StageMidpoints <- c(263.1, 257, 253.2, 251.7, 249.2, 244.6)
+RawData <- dplyr::filter(RawData, nchar(late_interval) == 0) %>%
+  dplyr::filter(early_interval %in% StageNames)
+CleanData <- lapply(as.list(StageNames), function(x)
+  {unlist(lapply(strsplit(RawData[RawData[, "early_interval"] == x,
+  "genus"], split = " "), function(y) y[1]))})
+names(CleanData) <- StageNames
 
-
-
-unique(RawData[unique(RawData[, "accepted_rank"]) == "species", "accepted_name"])
 
 
 
