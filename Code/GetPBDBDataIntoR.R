@@ -13,7 +13,7 @@
 # First up we need to install the packages we will want to use (note this may
 # take a while and you might be prompted to install additional packages):
 PackageBundle <- c("devtools", "earth", "iNEXT", "nlme", "paleoTS", "plotrix",
-  "praise", "tidyverse", "velociraptr")
+  "praise", "tidyverse", "velociraptr", "viridis")
 utils::install.packages(PackageBundle, dependencies = TRUE)
 devtools::install_github("graemetlloyd/metatree")
 
