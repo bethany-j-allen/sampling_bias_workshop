@@ -192,6 +192,30 @@ RawData <- dplyr::filter(RawData, nchar(late_interval) == 0) %>%
 # Note that we are doing this in a simple, automated fashion, which loses
 # lots of occurrences unnecessarily, such as those dated to a single substage
 # or regional biozone and only do so here for ease.
+
+# Higher taxon loop
+# Create an empty dataset with PBDB column names to collect unique occurrences in
+unique_by_stage <- RawData[FALSE,]
+
+#Loop through each collection
+# For that collection, retain species occurrences, then retain unique taxa at gradually
+# higher taxonomic levels which are not already represented in that collection
+# i.e. if there is an indeterminate dicynodont but no occurrences in that collection which
+# are dicynodonts but more specifically identified, the occurrence is retained
+for (i in 1:(length(StageNames))) {
+  print(i)
+  one_stage <- RawData %>% filter(early_interval == StageNames[i])
+  for (j in 1:(nrow(one_stage))) {
+    if (one_stage$identified_rank[j] == "species") unique_by_stage <- rbind(unique_by_stage, one_stage[j,]) else
+    if (!is.na(one_stage$genus[j]))
+      (if (one_stage$genus[j] %in% one_stage$genus[-j] == F) unique_by_stage <- rbind(unique_by_stage, one_stage[j,])) else
+        if (!is.na(one_stage$family[j]))
+          (if (one_stage$family[j] %in% one_stage$family[-j] == F) unique_by_stage <- rbind(unique_by_stage, one_stage[j,])) else
+            if (!is.na(one_stage$order[j]))
+              (if (one_stage$order[j] %in% one_stage$order[-j] == F) unique_by_stage <- rbind(unique_by_stage, one_stage[j,]))
+  }
+}
+
 #
 # We can now extract clean data (the genus names for each fossil occurrence)
 # as vectors for each stage and store them as a list:
@@ -219,25 +243,4 @@ plot(x = StageMidpoints, y = unlist(lapply(CleanData, function(x)
 # stages of recovery. Next we can look at how much of this pattern may be
 # down to sampling bias (see other scripts).
 
-#Higher taxon loop
-#Create an empty dataset with PBDB column names to collect unique occurrences in
-unique_by_stage <- RawData[FALSE,]
-
-#Loop through each collection
-#For that collection, retain species occurrences, then retain unique taxa at gradually
-#   higher taxonomic levels which are not already represented in that collection
-#   i.e. if there is an indeterminate dicynodont but no occurrences in that collection which
-#   are dicynodonts but more specifically identified, the occurrence is retained
-for (i in 1:(length(StageNames))) {
-  print(i)
-  one_stage <- RawData %>% filter(early_interval == StageNames[i])
-  for (j in 1:(nrow(one_stage))) {
-      if (!is.na(one_stage$genus[j]))
-        (if (one_stage$genus[j] %in% one_stage$genus[-j] == F) unique_by_stage <- rbind(unique_by_stage, one_stage[j,])) else
-          if (!is.na(one_stage$family[j]))
-            (if (one_stage$family[j] %in% one_stage$family[-j] == F) unique_by_stage <- rbind(unique_by_stage, one_stage[j,])) else
-              if (!is.na(one_stage$order[j]))
-                (if (one_stage$order[j] %in% one_stage$order[-j] == F) unique_by_stage <- rbind(unique_by_stage, one_stage[j,]))
-  }
-}
 
