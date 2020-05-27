@@ -196,7 +196,7 @@ RawData <- dplyr::filter(RawData, nchar(late_interval) == 0) %>%
 # We can now extract clean data (the genus names for each fossil occurrence)
 # as vectors for each stage and store them as a list:
 CleanData <- lapply(as.list(StageNames), function(x)
-  {unlist(lapply(strsplit(unique_by_stage[unique_by_stage[, "early_interval"] == x,
+  {unlist(lapply(strsplit(RawData[RawData[, "early_interval"] == x,
   "genus"], split = " "), function(y) y[1]))})
 
 # And add the stage names for each one:
