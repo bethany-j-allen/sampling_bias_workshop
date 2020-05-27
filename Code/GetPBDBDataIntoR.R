@@ -162,12 +162,12 @@ RawData <- dplyr::filter(RawData, nchar(genus) > 0)
 # We can see this has shrunk the data, but not by much:
 nrow(RawData)
 
-# Anotehr important issue to consider is that synonymisation of taxa in the
+# Another important issue to consider is that synonymisation of taxa in the
 # PBDB can lead to separate entries with the same name (as junior synonyms are
 # replaced with their senior counterparts. If you want to know about richness
 # this is an issue, as it artificially inflates your estimate.
 #
-#  We can stop this from happening by stripping out combinations of the same
+# We can stop this from happening by stripping out combinations of the same
 # collection no. AND accepted name.
 RawData <- dplyr::distinct(RawData, accepted_name, collection_no,
   .keep_all = TRUE)
@@ -202,7 +202,7 @@ CleanData <- lapply(as.list(StageNames), function(x)
 # And add the stage names for each one:
 names(CleanData) <- StageNames
 
-# We cna then access the names given to each occurrence in a stage with (for
+# We can then access the names given to each occurrence in a stage with (for
 # the Induan):
 CleanData[["Induan"]]
 
@@ -220,29 +220,9 @@ plot(x = StageMidpoints, y = unlist(lapply(CleanData, function(x)
 # down to sampling bias (see other scripts).
 
 
-# Higher taxon loop
-# Create an empty dataset with PBDB column names to collect unique occurrences in
-unique_by_stage <- RawData[FALSE,]
 
-#Loop through each collection
-# For that collection, retain species occurrences, then retain unique taxa at gradually
-# higher taxonomic levels which are not already represented in that collection
-# i.e. if there is an indeterminate dicynodont but no occurrences in that collection which
-# are dicynodonts but more specifically identified, the occurrence is retained
-for (i in 1:(length(StageNames))) {
-  print(i)
-  one_stage <- RawData %>% filter(early_interval == StageNames[i])
-  for (j in 1:(nrow(one_stage))) {
-    if (one_stage$identified_rank[j] == "species") unique_by_stage <- rbind(unique_by_stage, one_stage[j,]) else
-      if (!is.na(one_stage$genus[j]))
-        (if (one_stage$genus[j] %in% one_stage$genus[-j] == F) unique_by_stage <- rbind(unique_by_stage, one_stage[j,])) else
-          if (!is.na(one_stage$family[j]))
-            (if (one_stage$family[j] %in% one_stage$family[-j] == F) unique_by_stage <- rbind(unique_by_stage, one_stage[j,])) else
-              if (!is.na(one_stage$order[j]))
-                (if (one_stage$order[j] %in% one_stage$order[-j] == F) unique_by_stage <- rbind(unique_by_stage, one_stage[j,]))
-  }
-}
+# TO DO:
+# Occurrences through time
+# N formations through time
 
-#Remove repeats of genus names, to get one occurrence per unique genus per stage
-unique_by_stage <- distinct(unique_by_stage, genus, early_interval, .keep_all = T)
-#This line won't work in its present form, might need thinking about...
+
