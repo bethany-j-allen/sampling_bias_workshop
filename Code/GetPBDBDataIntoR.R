@@ -26,10 +26,10 @@ for(pkg in c(PackageBundle, "metatree")) try(library(pkg,
 # functions you want to use. Here we are going to take advantage of the
 # Paleobiology Database's "API" (short for Application Programming Interface),
 # which lets us "download" data directly into R. We are also going to use as
-# an example data set Permo-Triassic brachiopods.
+# an example data set Permo-Triassic bivalves.
 #
 # We can begin by setting up some variables:
-Taxa <- "Brachiopoda" # Set "Taxa" as the taxonomic group of interest
+Taxa <- "Bivalvia" # Set "Taxa" as the taxonomic group of interest
 StartInterval <- "Capitanian" # Set start interval for sampling window
 StopInterval <- "Anisian" # Set stop interval for sampling window
 
@@ -88,7 +88,7 @@ utils::read.csv("https://paleobiodb.org/data1.2/occs/list.csv?taxon_id=34920&sho
 # should use taxon_id= and the taxon number, and not base_name= and the taxon
 # name. Again, with nrachiopods we are OK, but remember that the ICZN and
 # ICBN are separate entities so there is nothing to stop someone naming a
-# group of plants Brachiopoda!
+# group of plants Bivalvia!
 #
 # Now we have stated what taxon we want the next thing to do is add any
 # additional options we want to add to our query. The obvious one here is the
@@ -208,7 +208,7 @@ CleanData[["Induan"]]
 
 # Note that this is a small list as these are the occurrences from the first
 # stage after the Permo-Traissic extinction. Things are not looking good for
-# our brachiopods.
+# our bivalves.
 #
 # We can do a simple (face value) diversity curve with:
 plot(x = StageMidpoints, y = unlist(lapply(CleanData, function(x)
