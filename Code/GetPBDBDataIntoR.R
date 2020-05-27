@@ -218,3 +218,30 @@ plot(x = StageMidpoints, y = unlist(lapply(CleanData, function(x)
 # The Permo-Triassic extinction appears pretty evident, as are the early
 # stages of recovery. Next we can look at how much of this pattern may be
 # down to sampling bias (see other scripts).
+
+#Higher taxon loop
+#Create an empty dataset with PBDB column names to collect unique occurrences in
+unique_by_substage <- tetrapods[FALSE,]
+
+#Loop through each collection
+#For that collection, retain species occurrences, then retain unique taxa at gradually
+#   higher taxonomic levels which are not already represented in that collection
+#   i.e. if there is an indeterminate dicynodont but no occurrences in that collection which
+#   are dicynodonts but more specifically identified, the occurrence is retained
+for (i in 1:(length(substages))) {
+  print(i)
+  one_substage <- tetrapods %>% filter(substage_assignment == substages[i])
+  for (j in 1:(nrow(one_substage))) {
+    if (one_substage$accepted_rank[j] == "species") unique_by_substage <- rbind(unique_by_substage, one_substage[j,]) else
+      if (!is.na(one_substage$genus[j]))
+        (if (one_substage$genus[j] %in% one_substage$genus[-j] == F) unique_by_substage <- rbind(unique_by_substage, one_substage[j,])) else
+          if (!is.na(one_substage$family[j]))
+            (if (one_substage$family[j] %in% one_substage$family[-j] == F) unique_by_substage <- rbind(unique_by_substage, one_substage[j,])) else
+              if (!is.na(one_substage$order[j]))
+                (if (one_substage$order[j] %in% one_substage$order[-j] == F) unique_by_substage <- rbind(unique_by_substage, one_substage[j,]))
+  }
+}
+
+#Remove repeats of species names, to get one occurrence per unique species per substage
+unique_by_substage <- distinct(unique_by_substage, accepted_name, substage_assignment, .keep_all = T)
+
