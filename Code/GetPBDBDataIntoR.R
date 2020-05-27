@@ -162,12 +162,12 @@ RawData <- dplyr::filter(RawData, nchar(genus) > 0)
 # We can see this has shrunk the data, but not by much:
 nrow(RawData)
 
-# Anotehr important issue to consider is that synonymisation of taxa in the
+# Another important issue to consider is that synonymisation of taxa in the
 # PBDB can lead to separate entries with the same name (as junior synonyms are
 # replaced with their senior counterparts. If you want to know about richness
 # this is an issue, as it artificially inflates your estimate.
 #
-#  We can stop this from happening by stripping out combinations of the same
+# We can stop this from happening by stripping out combinations of the same
 # collection no. AND accepted name.
 RawData <- dplyr::distinct(RawData, accepted_name, collection_no,
   .keep_all = TRUE)
@@ -202,7 +202,7 @@ CleanData <- lapply(as.list(StageNames), function(x)
 # And add the stage names for each one:
 names(CleanData) <- StageNames
 
-# We cna then access the names given to each occurrence in a stage with (for
+# We can then access the names given to each occurrence in a stage with (for
 # the Induan):
 CleanData[["Induan"]]
 
@@ -221,11 +221,8 @@ plot(x = StageMidpoints, y = unlist(lapply(CleanData, function(x)
 
 
 
-
-
 # TO DO:
 # Occurrences through time
 # N formations through time
-
 
 
