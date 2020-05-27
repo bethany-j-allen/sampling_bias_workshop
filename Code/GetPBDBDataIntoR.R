@@ -14,7 +14,7 @@
 # take a while and you might be prompted to install additional packages):
 PackageBundle <- c("devtools", "earth", "iNEXT", "nlme", "paleoTS", "plotrix",
   "praise", "tidyverse", "velociraptr")
-install.packages(PackageBundle, dependencies = TRUE)
+utils::install.packages(PackageBundle, dependencies = TRUE)
 devtools::install_github("graemetlloyd/metatree")
 
 # And load these into memory:
@@ -63,31 +63,32 @@ StopInterval <- gsub(" ", "%20", StopInterval)
 # we can use our Taxa variable from above with:
 paste0("https://paleobiodb.org/data1.2/occs/list.csv?base_name=", Taxa)
 
-# It is worth pointing out that, again, that things can go wrong this way if
+# It is worth pointing out that, again, things can go wrong this way if
 # names are duplicated in the database. An example is the genus "Glyptolepis"
 # which is both a plant (type of conifer)...:
-browseURL("https://paleobiodb.org/classic/basicTaxonInfo?taxon_no=291933")
+utils::browseURL("https://paleobiodb.org/classic/basicTaxonInfo?taxon_no=291933")
 
 # ...and a fish (lobe-fin):
-browseURL("https://paleobiodb.org/classic/basicTaxonInfo?taxon_no=34920")
+utils::browseURL("https://paleobiodb.org/classic/basicTaxonInfo?taxon_no=34920")
 
 # Thus if we ask the database for Glyptolepis the response from the database
 # might not be what you expect. Let's skip ahead and ask for this data to
 # see what happens:
-utils::read.csv("https://paleobiodb.org/data1.2/occs/list.csv?base_name=Glyptolepis&show=coords,paleoloc,class&limit=all", header = T, na.strings ="")
+utils::read.csv("https://paleobiodb.org/data1.2/occs/list.csv?base_name=Glyptolepis&show=coords,paleoloc,class&limit=all", header = T, na.strings = "")
 
 # Instead of an error message (there are two Glyptotlepises!) the API just
 # goes with one of them (the plant). Note this is not happening because
 # there are no occurrences of the fish in the database. We can check that
 # this is true by asking for the "right" Glyptolepis (at least if you are a
 # fish person) with:
-utils::read.csv("https://paleobiodb.org/data1.2/occs/list.csv?taxon_id=34920&show=coords,paleoloc,class&limit=all", header = T, na.strings ="")
+utils::read.csv("https://paleobiodb.org/data1.2/occs/list.csv?taxon_id=34920&show=coords,paleoloc,class&limit=all",
+  header = T, na.strings = "")
 
 # Thus if you *really* want to be sure you are getting the data you want you
-# should use taxon_id= ad the taxon number, and not base_name= and the taxon
+# should use taxon_id= and the taxon number, and not base_name= and the taxon
 # name. Again, with nrachiopods we are OK, but remember that the ICZN and
-# ICBN are separate entitie so there is nothing to stop someone naming a group
-# of plants Brachiopoda!
+# ICBN are separate entities so there is nothing to stop someone naming a
+# group of plants Brachiopoda!
 #
 # Now we have stated what taxon we want the next thing to do is add any
 # additional options we want to add to our query. The obvious one here is the
@@ -106,68 +107,114 @@ paste0("https://paleobiodb.org/data1.2/occs/list.csv?base_name=", Taxa,
   "&interval=", StartInterval, ",", StopInterval,
   "&show=coords,paleoloc,class")
 
+# One final tip is to make sure you only get "regular" taxa and not something
+# from a parataxonomy (like egg or footprint "species") with the pres= option
+# and the value "regular":
+paste0("https://paleobiodb.org/data1.2/occs/list.csv?base_name=", Taxa,
+  "&interval=", StartInterval, ",", StopInterval,
+  "&show=coords,paleoloc,class&pres=regular")
+
 # Now we have a complete URL we can store it in a variable...:
 URL <- paste0("https://paleobiodb.org/data1.2/occs/list.csv?base_name=",
   Taxa, "&interval=", StartInterval, ",", StopInterval,
-  "&show=coords,paleoloc,class")
+  "&show=coords,paleoloc,class&pres=regular")
 
 # ...and then use the read.csv function to read the data into R:
-RawData <- utils::read.csv(URL, header = TRUE)
+RawData <- utils::read.csv(URL, header = TRUE, stringsAsFactors = FALSE)
 
 # This is a lot of data!:
 nrow(RawData)
 
-# So best to just look at part of it:
+# So best to just look at part of it to begin with:
 head(RawData)
 
-
-
-
-
-
-#  Use the PBDB API to download a dataset of tetrapods from the Wuchiapingian (early Late Permian) to
-#  Carnian (early Late Triassic)
-tetrapods <- utils::read.csv("https://paleobiodb.org/data1.2/occs/list.csv?base_name=Tetrapoda&interval=Wuchiapingian,Carnian&show=coords,paleoloc,class&limit=all", header = T, na.strings ="")
-#  Trim to the columns with information we want
-tetrapods <- tetrapods[, c("occurrence_no", "collection_no", "phylum", "class", "order",
-"family", "genus", "accepted_name", "early_interval", "late_interval", "max_ma",
-"min_ma", "lng", "lat", "paleolng", "paleolat")]
-
-#  Create a vector giving the chronological order of stages
-stages <- c("Wuchiapingian", "Changhsingian", "Induan", "Olenekian", "Anisian", "Ladinian",
-"Carnian")
-
-#  Create a vector of stage midpoints
-midpoints <- c(257, 253.2, 251.7, 249.2, 244.6, 239.5, 232)
-
-#  This code is set up to give you generic richness, but can be modified fairly easily to give other
-#  taxonomic levels of diversity.
-
-#  When taxa are made synonymous in the PBDB, they are retained as separate entries with the same
-#  name. If you want to know diversity, this is an issue, as it articifially inflates your estimate.
-#  We can stop this from happening by stripping out combinations of the same collection no. AND
-#  accepted name.
-tetrapods <- distinct(tetrapods, accepted_name, collection_no, .keep_all = T)
-
-#  Retain only occurrences which are identified to genus or species level
-tetrapods <- filter(tetrapods, !is.na(genus))
-
-#  Retain occurences which are dated to a single stage
-#  [Note: doing this in a simple, automated fashion loses lots of occurrences unnecessarily, such as
-#  those dated to a single substage or regional biozone, but is done here for ease]
-tetrapods <- filter(tetrapods, is.na(late_interval)) %>% filter(early_interval %in% stages)
-
-
-
-
-
-
-# Some package version of the query:
-
+# Note that you can do similar queries in packages such as velociraptr or
+# metatree, e.g.:
 VRData <- velociraptr::downloadPBDB(Taxa = Taxa, StartInterval = StartInterval, StopInterval = StopInterval)
+MTData <- metatree::PaleobiologyDBOccurrenceQuerier(unlist(lapply(apply(
+  metatree::PaleobiologyDBChildFinder("1", Taxa, interval = c(StartInterval,
+  StopInterval), returnrank = "3"), 1, list), function(x) {x <-
+  unlist(x)[c("OriginalTaxonNo", "ResolvedTaxonNo")]; gsub("txn:|var:",
+  "", unname(x[!is.na(x)][1]))})))
 
-MTData <- metatree::PaleobiologyDBOccurrenceQuerier(unlist(lapply(apply(metatree::PaleobiologyDBChildFinder("1", Taxa, interval = c(StartInterval, StopInterval), returnrank = "3"), 1, list), function(x) {x <- unlist(x)[c("OriginalTaxonNo", "ResolvedTaxonNo")]; gsub("txn:|var:", "", unname(x[!is.na(x)][1]))})))
+# But here we will stick with manual use of the API as it gives us more
+# options/control of the output.
+#
+# Importantly, you should never take a raw data query like these and use it
+# without some kind of scrutiny. But first we will simply trim away some of
+# the database fields (columns) we don't really need:
+RawData <- RawData[, c("occurrence_no", "collection_no", "phylum", "class",
+  "order", "family", "genus", "accepted_name", "early_interval",
+  "late_interval", "max_ma", "min_ma", "lng", "lat", "paleolng",
+  "paleolat", "identified_rank")]
 
+# We have already excluded egg and trace fossils ("form taxa" in the language
+# of the PBDB), but we also have a bunch of fossils that are only assignable
+# to some higher-level group:
+unique(RawData[, "identified_rank"])
 
+# There are clever ways some of these can be used to set some minimum level
+# of species diversity where no lower-level taxa are known, but for now we
+# will simply remove anything above genus-level (the level of analysis we
+# will use here):
+RawData <- dplyr::filter(RawData, nchar(genus) > 0)
 
+# We can see this has shrunk the data, but not by much:
+nrow(RawData)
 
+# Anotehr important issue to consider is that synonymisation of taxa in the
+# PBDB can lead to separate entries with the same name (as junior synonyms are
+# replaced with their senior counterparts. If you want to know about richness
+# this is an issue, as it artificially inflates your estimate.
+#
+#  We can stop this from happening by stripping out combinations of the same
+# collection no. AND accepted name.
+RawData <- dplyr::distinct(RawData, accepted_name, collection_no,
+  .keep_all = TRUE)
+
+# This has shrunk our data a little more:
+nrow(RawData)
+
+# Next we will consider occurrences not assigned to the stage(s) we want to
+# use as out time bins, but first we need to explicitly state what these are:
+StageNames <- c("Capitanian", "Wuchiapingian", "Changhsingian", "Induan",
+  "Olenekian", "Anisian")
+
+# Whilst we are at it we will also create a vector of stage midpoints we can
+# use later for (e.g.) plots:
+StageMidpoints <- c(263.1, 257, 253.2, 251.7, 249.2, 244.6)
+
+# Now we can use this information to only retain occurrences assigned to
+# *single* one of our named stages with:
+RawData <- dplyr::filter(RawData, nchar(late_interval) == 0) %>%
+  dplyr::filter(early_interval %in% StageNames)
+
+# Note that we are doing this in a simple, automated fashion, which loses
+# lots of occurrences unnecessarily, such as those dated to a single substage
+# or regional biozone and only do so here for ease.
+#
+# We can now extract clean data (the genus names for each fossil occurrence)
+# as vectors for each stage and store them as a list:
+CleanData <- lapply(as.list(StageNames), function(x)
+  {unlist(lapply(strsplit(RawData[RawData[, "early_interval"] == x,
+  "genus"], split = " "), function(y) y[1]))})
+
+# And add the stage names for each one:
+names(CleanData) <- StageNames
+
+# We cna then access the names given to each occurrence in a stage with (for
+# the Induan):
+CleanData[["Induan"]]
+
+# Note that this is a small list as these are the occurrences from the first
+# stage after the Permo-Traissic extinction. Things are not looking good for
+# our brachiopods.
+#
+# We can do a simple (face value) diversity curve with:
+plot(x = StageMidpoints, y = unlist(lapply(CleanData, function(x)
+  length(unique(x)))), xlab = "Time (Ma)", ylab = "Richness (N genera)",
+  type = "l", xlim = c(max(StageMidpoints), min(StageMidpoints)))
+
+# The Permo-Triassic extinction appears pretty evident, as are the early
+# stages of recovery. Next we can look at how much of this pattern may be
+# down to sampling bias (see other scripts).
