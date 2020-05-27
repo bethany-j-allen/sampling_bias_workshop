@@ -16,8 +16,8 @@ PackageBundle <- c("devtools", "earth", "iNEXT", "metatree", "nlme", "paleoTS",
 for(pkg in c(PackageBundle, "metatree")) try(library(pkg,
   character.only = TRUE), silent = TRUE)
 
-# ...alongside the data the data into R:
-RawData <- utils::read.csv("https://paleobiodb.org/data1.2/occs/list.csv?base_name=Brachiopoda&interval=Capitanian,Anisian&show=coords,paleoloc,class",
+# ...and we have gotten the data into R:
+RawData <- utils::read.csv("https://paleobiodb.org/data1.2/occs/list.csv?base_name=Bivalvia&interval=Capitanian,Norian&show=coords,paleoloc,class",
   header = TRUE, stringsAsFactors = FALSE)
 RawData <- RawData[, c("occurrence_no", "collection_no", "phylum", "class",
   "order", "family", "genus", "accepted_name", "early_interval",
