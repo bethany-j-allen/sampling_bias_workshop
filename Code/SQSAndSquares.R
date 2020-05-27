@@ -6,7 +6,7 @@
 
 # SCRIPT AIMS:
 #
-# 1. Learn how to use Shareholder Quorum Subsamling in R.
+# 1. Learn how to use Shareholder Quorum Subsampling in R.
 # 2. Learn how to use the Squares extrapolator in R.
 
 # Make sure the packages are loaded into memory...:
@@ -34,12 +34,12 @@ RawData <- dplyr::filter(RawData, nchar(late_interval) == 0) %>%
 ####################################
 ## (1) SQS
 
-#  Generate a table of sample sizes by substage - this will be used later to evaluate whether our
+#  Generate a table of sample sizes by stage - this will be used later to evaluate whether our
 #  diversity estimates are overextrapolated (Hsieh et al. 2016, the original iNEXT paper, says that
 #  an estimate of more than 2-3x your sample size should be considered unreliable)
-totals <- count(tetrapods, early_interval)
+totals <- count(RawData, early_interval)
 #  Order the substages in the table chronologically
-totals <- totals[match(stages, totals$early_interval),]
+totals <- totals[match(StageNames, totals$early_interval),]
 
 #  iNEXT requires input data in a very specific format. Each 'bin' that you want to sample needs a
 #  string of the relative abundances of each taxon, with the first number in the string being the total
@@ -57,9 +57,9 @@ totals <- totals[match(stages, totals$early_interval),]
 stage_freq <- list()
 
 #  Loop through each stage
-for (i in 1:length(stages)) {
+for (i in 1:length(StageNames)) {
   #  Filter the dataset to the desired stage, make a count string, and start with the string total
-  f_list <- tetrapods %>% filter(early_interval == stages[i]) %>%
+  f_list <- RawData %>% filter(early_interval == StageNames[i]) %>%
     count(., genus) %>% arrange(desc(n)) %>% add_row(n = sum(.$n), .before = 1) %>%
     select(n)
   f_list <- unlist(f_list, use.names = F)
@@ -69,7 +69,7 @@ for (i in 1:length(stages)) {
   stage_freq[[i]] <- f_list
 }
 #  Rename the strings with their stages
-names(stage_freq) <- stages
+names(stage_freq) <- StageNames
 #  Look at the strings to check they are sensible
 glimpse(stage_freq)
 
@@ -94,7 +94,7 @@ for(i in 1:length(quorum_levels)) {
   #  Label with the relevant quorum level, sample size and stage midpoint age
   estD$quorum_level <- quorum_levels[i]
   estD$reference_t <- totals$n
-  estD$midpoints <- midpoints[match(names(stage_freq), stages)]
+  estD$midpoints <- StageMidpoints[match(names(stage_freq), StageNames)]
   #  Add the output to the list
   estD_list[[i]] <- estD
 }
@@ -117,16 +117,15 @@ estD_list$quorum_level <- as.factor(estD_list$quorum_level)
 ggplot(estD_list, aes(x = midpoints, y = qD, ymin = qD.LCL, ymax = qD.UCL, group = quorum_level, colour = quorum_level)) +
   geom_line(size = 1) + geom_point() + geom_linerange() +
   scale_colour_manual(values = c("red", "orange", "darkgreen", "blue")) +
-  scale_x_reverse(limits = c(260, 227)) + labs(x = "Ma", y = "Interpolated genus diversity", colour = "Quorum level") +
-  geom_vline(aes(xintercept = 259.8), colour = "grey") + #Start of Wuchiapingian
+  scale_x_reverse(limits = c(266, 240)) + labs(x = "Ma", y = "SQS genus diversity", colour = "Quorum level") +
+  geom_vline(aes(xintercept = 265.1), colour = "grey") + #Start of Capitanian
+  geom_vline(aes(xintercept = 259.8), colour = "grey") + #Wuchiapingian
   geom_vline(aes(xintercept = 254.14), colour = "grey") + #Changhsingian
   geom_vline(aes(xintercept = 252.17), colour = "grey") + #Induan
   geom_vline(aes(xintercept = 252.17), linetype = "longdash", colour = "red") + #PT
   geom_vline(aes(xintercept = 251.2), colour = "grey") + #Olenekian
   geom_vline(aes(xintercept = 247.2), colour = "grey") + #Anisian
-  geom_vline(aes(xintercept = 242), colour = "grey") + #Ladinian
-  geom_vline(aes(xintercept = 237), colour = "grey") + #Carnian
-  geom_vline(aes(xintercept = 227), colour = "grey") + #End of Carnian
+  geom_vline(aes(xintercept = 242), colour = "grey") + #End of Anisian
   theme_classic()
 
 
@@ -148,9 +147,9 @@ ggplot(estD_list, aes(x = midpoints, y = qD, ymin = qD.LCL, ymax = qD.UCL, group
 stage_freq2 <- list()
 
 #  Loop through each stage
-for (i in 1:length(stages)) {
+for (i in 1:length(StageNames)) {
   #  Filter the dataset to the desired stage and make a count string
-  f_list2 <- tetrapods %>% filter(early_interval == stages[i]) %>% count(., genus) %>%
+  f_list2 <- RawData %>% filter(early_interval == StageNames[i]) %>% count(., genus) %>%
     arrange(desc(n)) %>% select(n)
   f_list2 <- unlist(f_list2, use.names = F)
   #  Add the string to the list
@@ -158,7 +157,7 @@ for (i in 1:length(stages)) {
 }
 
 #  Rename the strings with their stages
-names(stage_freq2) <- stages
+names(stage_freq2) <- StageNames
 #  Look at the strings to check they are sensible
 glimpse(stage_freq2)
 
@@ -188,19 +187,18 @@ for(i in 1:length(stage_freq2)) {
 }
 
 #  Label the squares estimates with the stage midpoints ready for plotting
-to_plot <- data.frame(squares_list, midpoints)
+to_plot <- data.frame(squares_list, StageMidpoints)
 
 #  Plot your diversity estimates
-ggplot(to_plot, aes(x = midpoints, y = squares_list)) +
+ggplot(to_plot, aes(x = StageMidpoints, y = squares_list)) +
   geom_line(size = 1) + geom_point() +
-  scale_x_reverse(limits = c(260, 227)) + labs(x = "Ma", y = "Squares genus diversity") +
-  geom_vline(aes(xintercept = 259.8), colour = "grey") + #Start of Wuchiapingian
+  scale_x_reverse(limits = c(266, 240)) + labs(x = "Ma", y = "Squares genus diversity") +
+  geom_vline(aes(xintercept = 265.1), colour = "grey") + #Start of Capitanian
+  geom_vline(aes(xintercept = 259.8), colour = "grey") + #Wuchiapingian
   geom_vline(aes(xintercept = 254.14), colour = "grey") + #Changhsingian
   geom_vline(aes(xintercept = 252.17), colour = "grey") + #Induan
   geom_vline(aes(xintercept = 252.17), linetype = "longdash", colour = "red") + #PT
   geom_vline(aes(xintercept = 251.2), colour = "grey") + #Olenekian
   geom_vline(aes(xintercept = 247.2), colour = "grey") + #Anisian
-  geom_vline(aes(xintercept = 242), colour = "grey") + #Ladinian
-  geom_vline(aes(xintercept = 237), colour = "grey") + #Carnian
-  geom_vline(aes(xintercept = 227), colour = "grey") + #End of Carnian
+  geom_vline(aes(xintercept = 242), colour = "grey") + #End of Anisian
   theme_classic()
