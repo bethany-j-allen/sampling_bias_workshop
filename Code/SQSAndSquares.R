@@ -1,8 +1,35 @@
-########################################################
-# Bethany's SQS and Squares code
-########################################################
+################################################################################
+#                                                                              #
+#                   SCRIPT III - SQS AND SQUARES                               #
+#                                                                              #
+################################################################################
 
-# MOVED ALL DATA LINES TO SETUP SCRIPT!
+# SCRIPT AIMS:
+#
+# 1. Learn how to use Shareholder Quorum Subsamling in R.
+# 2. Learn how to use the Squares extrapolator in R.
+
+# Make sure the packages are loaded into memory...:
+PackageBundle <- c("devtools", "earth", "iNEXT", "metatree", "nlme", "paleoTS",
+                   "plotrix", "praise", "tidyverse", "velociraptr", "viridis")
+for(pkg in c(PackageBundle, "metatree")) try(library(pkg,
+                                                     character.only = TRUE), silent = TRUE)
+
+# ...and we have gotten the data into R:
+RawData <- utils::read.csv("https://paleobiodb.org/data1.2/occs/list.csv?base_name=Bivalvia&interval=Capitanian,Norian&show=coords,paleoloc,class",
+                           header = TRUE, stringsAsFactors = FALSE)
+RawData <- RawData[, c("occurrence_no", "collection_no", "phylum", "class",
+                       "order", "family", "genus", "accepted_name", "early_interval",
+                       "late_interval", "max_ma", "min_ma", "lng", "lat", "paleolng",
+                       "paleolat", "identified_rank")]
+RawData <- dplyr::filter(RawData, nchar(genus) > 0)
+RawData <- dplyr::distinct(RawData, accepted_name, collection_no,
+                           .keep_all = TRUE)
+StageNames <- c("Capitanian", "Wuchiapingian", "Changhsingian", "Induan",
+                "Olenekian", "Anisian")
+StageMidpoints <- c(263.1, 257, 253.2, 251.7, 249.2, 244.6)
+RawData <- dplyr::filter(RawData, nchar(late_interval) == 0) %>%
+  dplyr::filter(early_interval %in% StageNames)
 
 ####################################
 ## (1) SQS
