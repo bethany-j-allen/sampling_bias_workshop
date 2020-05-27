@@ -218,3 +218,14 @@ plot(x = StageMidpoints, y = unlist(lapply(CleanData, function(x)
 # The Permo-Triassic extinction appears pretty evident, as are the early
 # stages of recovery. Next we can look at how much of this pattern may be
 # down to sampling bias (see other scripts).
+
+
+
+
+
+# TO DO:
+# Occurrences through time
+# N formations through time
+
+
+
