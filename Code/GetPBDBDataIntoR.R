@@ -124,6 +124,44 @@ head(RawData)
 
 
 
+
+#  Use the PBDB API to download a dataset of tetrapods from the Wuchiapingian (early Late Permian) to
+#  Carnian (early Late Triassic)
+tetrapods <- utils::read.csv("https://paleobiodb.org/data1.2/occs/list.csv?base_name=Tetrapoda&interval=Wuchiapingian,Carnian&show=coords,paleoloc,class&limit=all", header = T, na.strings ="")
+#  Trim to the columns with information we want
+tetrapods <- tetrapods[, c("occurrence_no", "collection_no", "phylum", "class", "order",
+"family", "genus", "accepted_name", "early_interval", "late_interval", "max_ma",
+"min_ma", "lng", "lat", "paleolng", "paleolat")]
+
+#  Create a vector giving the chronological order of stages
+stages <- c("Wuchiapingian", "Changhsingian", "Induan", "Olenekian", "Anisian", "Ladinian",
+"Carnian")
+
+#  Create a vector of stage midpoints
+midpoints <- c(257, 253.2, 251.7, 249.2, 244.6, 239.5, 232)
+
+#  This code is set up to give you generic richness, but can be modified fairly easily to give other
+#  taxonomic levels of diversity.
+
+#  When taxa are made synonymous in the PBDB, they are retained as separate entries with the same
+#  name. If you want to know diversity, this is an issue, as it articifially inflates your estimate.
+#  We can stop this from happening by stripping out combinations of the same collection no. AND
+#  accepted name.
+tetrapods <- distinct(tetrapods, accepted_name, collection_no, .keep_all = T)
+
+#  Retain only occurrences which are identified to genus or species level
+tetrapods <- filter(tetrapods, !is.na(genus))
+
+#  Retain occurences which are dated to a single stage
+#  [Note: doing this in a simple, automated fashion loses lots of occurrences unnecessarily, such as
+#  those dated to a single substage or regional biozone, but is done here for ease]
+tetrapods <- filter(tetrapods, is.na(late_interval)) %>% filter(early_interval %in% stages)
+
+
+
+
+
+
 # Some package version of the query:
 
 VRData <- velociraptr::downloadPBDB(Taxa = Taxa, StartInterval = StartInterval, StopInterval = StopInterval)
