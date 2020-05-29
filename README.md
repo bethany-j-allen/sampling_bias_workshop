@@ -18,6 +18,8 @@ Download R by choosing your local CRAN mirror here: https://cran.r-project.org/m
 
 Download R Studio here: https://rstudio.com/products/rstudio/download/#download
 
+We will only cover enough basic R here to allow new users to complete the practicals. If you want to learn more about R, we recommend the textbook "Getting Started with R: an introduction for biologists" by Andrew Beckerman, Dylan Childs and Owen Petchley.
+
 To access the workshop files, click the green "Clone or download" button at the top right of this page, and select "Download ZIP". Once downloaded, open the folder by right-clicking and selecting "Extract all", saving the files somewhere you can access them - you will have to tell R where the files are when you start the practicals.
 
 If you have your own GitHub account, you may want to keep your own copy of this repository by 'forking' it, again via the relevant button at the top right of this page.
