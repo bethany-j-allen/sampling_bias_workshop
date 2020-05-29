@@ -232,3 +232,12 @@ ggplot(to_plot, aes(x = StageMidpoints, y = squares_list)) +
   geom_vline(aes(xintercept = 247.2), colour = "grey") + #Anisian
   geom_vline(aes(xintercept = 242), colour = "grey") + #End of Anisian
   theme_classic()
+
+# Most of the code in this script was developed from the supplement from Bethany's upcoming
+# paper (Allen et al. 2020, The latitudinal diversity gradient of tetrapods across the
+# Permo-Triassic mass extinction and recovery interval, Proc. Roy. Soc. B).
+
+# There are a multitude of other methods available for estimating evolutionary parameters whilst
+# taking sampling into account. If you want to know more, we have provided a 'Further Reading'
+# list which is a good place to start. For specific questions, you can ask us at the workshop
+# drop-in, use the '#workshop' channel on Discord or email any of the workshop authors.
