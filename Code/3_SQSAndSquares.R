@@ -6,8 +6,8 @@
 
 # SCRIPT AIMS:
 #
-# 1. Learn how to use Shareholder Quorum Subsampling in R.
-# 2. Learn how to use the Squares extrapolator in R.
+# 1. Learn about the basics of coverage-based methods for estimating diversity.
+# 2. Implement Shareholder Quorum Subsampling (SQS) and the Squares extrapolator in R.
 
 # Make sure the packages are loaded into memory...:
 PackageBundle <- c("devtools", "earth", "iNEXT", "metatree", "nlme", "paleoTS",
@@ -31,89 +31,108 @@ StageMidpoints <- c(263.1, 257, 253.2, 251.7, 249.2, 244.6)
 RawData <- dplyr::filter(RawData, nchar(late_interval) == 0) %>%
   dplyr::filter(early_interval %in% StageNames)
 
+# In Script Two you were introduced to rarefaction and bootstrapping, which are fairly simplistic
+# ways of estimating diversity in deep time. Here we introduce coverage-based methods, which use
+# strings of rank-order abundance to try and estimate sampling completeness, and this informs the
+# degree of extrapolation or subsampling carried out for each sample.
+
+# Here we will use the same dataset as before - bivalves from the Permian and Triassic - to implement
+# Shareholder Quorum Subsampling (Alroy, 2010) using iNEXT (Hsieh et al. 2016), and the Squares
+# extrapolator (Alroy, 2018).
+
 ####################################
-## (1) SQS
+## (1) Shareholder Quorum Subsampling (SQS)
+# SQS uses rank-order abundance to estimate diversity at different degrees of sampling completeness,
+# or 'quorum levels'.
 
-#  Generate a table of sample sizes by stage - this will be used later to evaluate whether our
-#  diversity estimates are overextrapolated (Hsieh et al. 2016, the original iNEXT paper, says that
-#  an estimate of more than 2-3x your sample size should be considered unreliable)
+# First we generate a table of occurrences by stage:
 totals <- count(RawData, early_interval)
-#  Order the substages in the table chronologically
+# The we reorder the substages in the table chronologically:
 totals <- totals[match(StageNames, totals$early_interval),]
+# This will be used later to evaluate whether our diversity estimates are overextrapolated. Hsieh et al.
+# says that an estimate of more than 2-3x your sample size should be considered unreliable.
 
-#  iNEXT requires input data in a very specific format. Each 'bin' that you want to sample needs a
-#  string of the relative abundances of each taxon, with the first number in the string being the total
-#  number of occurrences. So, if you had a sample containing 1 Aenigmasaurus, 2 Dicynodon,
-#  5 Lystrosaurus, 1 Moschorhinus, and 1 Prolacerta, the string would look like this:
+# iNEXT requires input data in a very specific format. Each 'bin' that you want to sample needs a
+# string of the abundance of each taxon, with the first number in the string being the total
+# number of occurrences. So, if you had a sample containing 1 Aenigmasaurus, 2 Dicynodon,
+# 5 Lystrosaurus, 1 Moschorhinus, and 1 Prolacerta, the string would look like this:
 # Karoo Sample   10 5 2 1 1 1
-#  The nature of data in the PBDB means that, particularly with vertebrate data, the 'abundance' of a
-#  taxon is usually a count of the number of collections (~ number of localities) in which it is
-#  present, rather than a strict count of the number of individuals.
+# Given the nature of our input data, we need to carefully consider what our 'abundance' actually is.
+# Locality-based abundance data is inconsistently applied in the PBDB, so for most analyses, the
+# abundance of a taxon is actually a count of the number of collections (~ number of localities)
+# in which it is present, rather than a strict count of the number of individuals.
 
-#  The next bit of code takes occurrences in the format of a standard PBDB download and generates
-#  the necessary abundance strings, with each geologic stage treated as a separate bin.
+# We will now take our PBDB occurrence data and convert it into rank abundance strings, one for each
+# stage.
 
-#  Make an empty list to store the strings in
+# First, we need to make an empty list to store the strings in:
 stage_freq <- list()
 
-#  Loop through each stage
+# Then we loop through each stage:
 for (i in 1:length(StageNames)) {
-  #  Filter the dataset to the desired stage, make a count string, and start with the string total
+  # We filter the dataset to the desired stage, make the rank abundance string, and add the string
+  # total at the start, before converting it into a vector:
   f_list <- RawData %>% filter(early_interval == StageNames[i]) %>%
     count(., genus) %>% arrange(desc(n)) %>% add_row(n = sum(.$n), .before = 1) %>%
     select(n)
   f_list <- unlist(f_list, use.names = F)
-  #  If there are less than 3 taxa in the bin, make the string NA
+  # If there are less than 3 taxa in the stage, we make the string NA (as SQS won't work on so small
+  # a sample)...:
   if(f_list[1] < 3){f_list <- NA}
-  #  Add the string to the list
+  # ...and then we add the string to the list:
   stage_freq[[i]] <- f_list
 }
-#  Rename the strings with their stages
+# Once each stage has a rank abundance string, we rename the strings with their stages:
 names(stage_freq) <- StageNames
-#  Look at the strings to check they are sensible
+
+# You can now take a look at your set of rank abundance strings:
 glimpse(stage_freq)
 
-#  Filter out the NA strings (bins with less than 3 taxa) if necessary
+# If any of the stages contained less than 3 taxa, they will now be listed as NA. These need to be
+# removed before we run SQS:
 stage_freq <- stage_freq[!is.na(stage_freq)]
 
-#  [This next bit of the code is based on Dunne et al. 2018 (https://doi.org/10.1098/rspb.2017.2730)]
+# Now we start running SQS [this next bit of the code is based on Dunne et al. 2018].
 
-#  Set your quorum levels - this is the proportion of taxa you want to sample up to, in the paper they
-#  used 0.4 - 0.7, which is a fairly standard range
+# First we need to set our quorum levels, or the levels of sampling completeness you want to produce.
+# Here we will use 0.4 to 0.7, a fairly standard range in the literature:
 quorum_levels <- round(seq(from = 0.4, to = 0.7, by = 0.1), 1)
 
-#  Estimate your diversity levels using estimateD in iNEXT
-#  Make an empty list to store the outputs in
+# Then we make an empty list to store the outputs in:
 estD_list <- list()
 
-#  Loop through each desired quorum level
+# We loop through each desired quorum level:
 for(i in 1:length(quorum_levels)) {
+  # We use the estimateD function in iNEXT for our desired quorum level...:
   estD <- estimateD(stage_freq, datatype = "incidence_freq", base = "coverage", level = quorum_levels[i])
-  #  Filter the iNEXT output to the species diversity estimates
+  # ...then filter the iNEXT output to the diversity estimates:
   estD <- filter(estD, order == 0)
-  #  Label with the relevant quorum level, sample size and stage midpoint age
+  # We then label the estimates with the quorum level, measured sample size (which we produced at the start
+  # of the script) and stage midpoint age:
   estD$quorum_level <- quorum_levels[i]
   estD$reference_t <- totals$n
   estD$midpoints <- StageMidpoints[match(names(stage_freq), StageNames)]
-  #  Add the output to the list
+  # Finally the output is added to our list:
   estD_list[[i]] <- estD
 }
+# iNEXT may give you a warning at this point about overextrapolation beyond the measured sample size.
+# We have labelled the estimates with their sample sizes to check this, and will do so shortly.
 
-#  [You might get an error at this point warning you about overextrapolation - we'll fix that shortly]
-
-#  Bind the individual dataframes into one
+# We bind the individual dataframes into one:
 estD_list <- bind_rows(estD_list)
 
-#  Remove values where estimated diversity is more than three times the sample size (see earlier)
+# Then remove values where the estimated diversity is more than three times the sample size (see earlier):
 estD_list[which(estD_list$t >= 3 * estD_list$reference_t), c("qD", "qD.LCL", "qD.UCL")] <- rep(NA, 3)
 
-#  Take a look at the list to check it looks sensible
+# Now we can look at our estimates:
 View(estD_list)
 
-#  Make quorum level a factor (this helps with plotting)
+# In order to plot the data, we need to make quorum level a 'factor':
 estD_list$quorum_level <- as.factor(estD_list$quorum_level)
 
-#  Plot your diversity estimates - the error bars are 95% confidence intervals
+# And finally we can plot our diversity estimates. The error bars are 95% confidence intervals. This plot
+# includes lines to indicate the start and end of our stages, as well as a red-dashed line for the Permian-
+# Triassic boundary:
 ggplot(estD_list, aes(x = midpoints, y = qD, ymin = qD.LCL, ymax = qD.UCL, group = quorum_level, colour = quorum_level)) +
   geom_line(size = 1) + geom_point() + geom_linerange() +
   scale_colour_manual(values = c("red", "orange", "darkgreen", "blue")) +
