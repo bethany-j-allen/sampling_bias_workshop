@@ -32,7 +32,7 @@ RawData <- dplyr::filter(RawData, nchar(late_interval) == 0) %>%
   dplyr::filter(early_interval %in% StageNames)
 
 # In Script Two you were introduced to rarefaction and bootstrapping, which are fairly simplistic
-# ways of estimating diversity in deep time. Here we introduce coverage-based methods, which use
+# ways of estimating diversity in deep time. Now we introduce coverage-based methods, which use
 # strings of rank-order abundance to try and estimate sampling completeness, and this informs the
 # degree of extrapolation or subsampling carried out for each sample.
 
@@ -42,8 +42,11 @@ RawData <- dplyr::filter(RawData, nchar(late_interval) == 0) %>%
 
 ####################################
 ## (1) Shareholder Quorum Subsampling (SQS)
-# SQS uses rank-order abundance to estimate diversity at different degrees of sampling completeness,
-# or 'quorum levels'.
+# SQS (Alroy, 2010) uses rank-order abundance to estimate diversity through subsampling at different
+# degrees of sampling completeness, or 'quorum levels', and estimates diversity using a metric called
+# Good's u. Here we will use iNEXT, which estimates diversity using Hill numbers via both subsampling
+# and extrapolation, using the equations of Chao and Jost (2012). This subsampling method has been
+# shown to be analogous to SQS (Close et al. 2018).
 
 # First we generate a table of occurrences by stage:
 totals <- count(RawData, early_interval)
@@ -150,8 +153,10 @@ ggplot(estD_list, aes(x = midpoints, y = qD, ymin = qD.LCL, ymax = qD.UCL, group
 
 ####################################
 ## (2) Squares
-# Squares is an extrapolator developed by Alroy (2018). We use the equation stated in this paper
-# to generate our diversity estimates.
+# Squares is an extrapolator developed by Alroy (2018). It is also a coverage-based approach which has
+# been shown to perform well when the rank abundance distributions of samples are particularly
+# strongly skewed (i.e. many rare taxa, as is often the case with fossil data) (Alroy 2018, 2020).
+# We use the equation as stated by Alroy(2018) to generate our diversity estimates.
 
 # Squares also uses rank abundance strings of each taxon, but this time, we don't need the string sum
 # at the front. So now, if you had a sample containing 1 Aenigmasaurus, 2 Dicynodon, 5 Lystrosaurus,
