@@ -150,65 +150,71 @@ ggplot(estD_list, aes(x = midpoints, y = qD, ymin = qD.LCL, ymax = qD.UCL, group
 
 ####################################
 ## (2) Squares
+# Squares is an extrapolator developed by Alroy (2018). We use the equation stated in this paper
+# to generate our diversity estimates.
 
-#  Squares also uses strings of the relative abundances of each taxon, but without the string sum
-#  at the front. So this time, if you had a sample containing 1 Aenigmasaurus, 2 Dicynodon,
-#  5 Lystrosaurus, 1 Moschorhinus, and 1 Prolacerta, the string would look like this:
+# Squares also uses rank abundance strings of each taxon, but this time, we don't need the string sum
+# at the front. So now, if you had a sample containing 1 Aenigmasaurus, 2 Dicynodon, 5 Lystrosaurus,
+# 1 Moschorhinus, and 1 Prolacerta, the string would look like this:
 # Karoo Sample   5 2 1 1 1
-#  The nature of data in the PBDB means that, particularly with vertebrate data, the 'abundance' of a
-#  taxon is usually a count of the number of collections (~ number of localities) in which it is
-#  present, rather than a strict count of the number of individuals.
+# As before, abundance here is the number of PBDB collections the taxon is present in.
 
-#  The next bit of code takes occurrences in the format of a standard PBDB download and generates
-#  the necessary abundance strings, with each geologic stage treated as a separate bin.
-
-#  Make an empty list to store the strings in
+# So again, we start by making an empty list to store the strings in:
 stage_freq2 <- list()
 
-#  Loop through each stage
+# We then loop through each stage:
 for (i in 1:length(StageNames)) {
-  #  Filter the dataset to the desired stage and make a count string
+  # We filter the dataset to that stage and make a rank abundance string:
   f_list2 <- RawData %>% filter(early_interval == StageNames[i]) %>% count(., genus) %>%
     arrange(desc(n)) %>% select(n)
+  # We convert it to a vector for ease of use...:
   f_list2 <- unlist(f_list2, use.names = F)
-  #  Add the string to the list
+  # ...and add the vector to the list:
   stage_freq2[[i]] <- f_list2
 }
 
-#  Rename the strings with their stages
+# We then rename the strings with their stages:
 names(stage_freq2) <- StageNames
-#  Look at the strings to check they are sensible
+
+# You can see that the strings should be identical to the ones we made last time, just without the
+# sum at the start:
 glimpse(stage_freq2)
 
-#  Estimate diversity using squares method, based on the equation by Alroy (2018, see Further reading)
+# Now we come to using the strings to estimate diversity with the squares method. Alroy (2018) states
+# the equation for extrapolating with squares, and here we have the equation hard-coded so you can see
+# what is happening.
 
-#  Make an empty vector to store the squares estimates in
+# We start by, again, making an empty vector to store the squares estimates in:
 squares_list <- vector("numeric", length = 0)
 
-#  Loop through each stage
+# Then we loop through each stage:
 for(i in 1:length(stage_freq2)) {
+  # This line filters the rank-abundance string of the stage of interest:
   count_list <- stage_freq2[[i]]
-    # Find number of genera
+    # Then we find total number of genera in the string (by finding the length of the list):
     genus_count <- length(count_list)
-    #  Find number of singletons
+    # We find the number of singletons (the number of genera in the string with an abundance of 1):
     sing_count <- sum(count_list == 1)
-    #  Find number of individuals (sum of string)
+    # We find the number of individuals (the sum of the string):
     ind_count <- sum(count_list)
-    #  Find the sum of the string squared (hence the name)
+    # And finally we dind the sum of the string squared (this is where the name comes from):
     sum_nsq <- sum(count_list^2)
-    #  The equation
+    # Now we have our input parameters, we put them into our squares equation:
     squares <- genus_count + (((sing_count^2)*sum_nsq)/((ind_count^2) - (sing_count*genus_count)))
-    #  Because the equation is a fraction, you can get an estimate of infinity if all taxa are
-    #  singletons - this is a failsafe against that
-    if(squares == Inf){squares <- length(count_list)}
-  #  Add the squares estimate to the end of the vector
+    # Because the equation is a fraction, you can get an estimate of infinity if all taxa are
+    # singletons. As a safeguard against that, if the estimate comes out as infinite, we
+    # replace it with the observed genus count:
+    if(squares == Inf){squares <- genus_count}
+  # Finally we add the squares estimate to the end of the vector:
   squares_list <- append(squares_list, squares)
 }
+# And that's it! We now have our list of diversity estimates per stage.
 
-#  Label the squares estimates with the stage midpoints ready for plotting
+# We will label the squares estimates with their stage midpoints...:
 to_plot <- data.frame(squares_list, StageMidpoints)
 
-#  Plot your diversity estimates
+# ...and finally plot them. As before, the grey lines to indicate the start and end of our stages,
+# with red-dashed line for the Permian-Triassic boundary:
 ggplot(to_plot, aes(x = StageMidpoints, y = squares_list)) +
   geom_line(size = 1) + geom_point() +
   scale_x_reverse(limits = c(266, 240)) + labs(x = "Ma", y = "Squares genus diversity") +
