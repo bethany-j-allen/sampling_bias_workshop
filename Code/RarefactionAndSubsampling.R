@@ -356,7 +356,7 @@ plot(x = StageMidpoints, y = BootstrappedCollections, xlab = "Time (Ma)",
 points(x = StageMidpoints, y = BootstrappedCollections, pch = 20, cex = 2,
   col = viridis::viridis(length(StageNames)))
 
-# To finish up we can compare some of these results side-by-side:
+# To finish up we can compare our results side-by-side:
 par(mfrow = c(3, 1))
 plot(x = StageMidpoints, y = unlist(lapply(CleanData, function(x)
   length(unique(x)))), xlab = "Time (Ma)", ylab = "Richness (N genera)",
@@ -381,15 +381,10 @@ plot(x = StageMidpoints, y = BootstrappedCollections, xlab = "Time (Ma)",
 points(x = StageMidpoints, y = BootstrappedCollections, pch = 20, cex = 2,
   col = viridis::viridis(length(StageNames)))
 
-
-
-
-
-# ADD BELOW TO THE SETUP SCRIPT:
-
-"https://paleobiodb.org/data1.2/"
-
-
-
-
-
+# You should see that, at least in this case, subsampling doesn't change the
+# pattern that much. Bivalves were diverse in the Late Permian, showed a huge
+# drop off in the earliest Triassic but recovered to pre-Triassic levels by
+# the Anisian.
+#
+# In the next script we will look at the more sophisticated coverage based
+# methods.
