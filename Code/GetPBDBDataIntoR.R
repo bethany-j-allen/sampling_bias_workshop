@@ -100,13 +100,17 @@ paste0("https://paleobiodb.org/data1.2/occs/list.csv?base_name=", Taxa,
 # Note that the start and end of the interval have to be separated by a comma.
 #
 # We can now add some additional options for what we want the output to include
-# with show=. If you want multiple things, agaian, these must be seoarated by
+# with show=. If you want multiple things, again, these must be seoarated by
 # commas. Here we will ask for coordinate data (coords), palaeo-locality data
-# (paleoloc) and taxonomic hierarchy data (class):
+# (paleoloc), taxonomic hierarchy data (class) and stratigraphic information
+# (strat):
 paste0("https://paleobiodb.org/data1.2/occs/list.csv?base_name=", Taxa,
   "&interval=", StartInterval, ",", StopInterval,
-  "&show=coords,paleoloc,class")
+  "&show=coords,paleoloc,class,strat")
 
+# (Note: for a full list of all the options you should consult the API
+# documentation at: https://paleobiodb.org/data1.2/.)
+#
 # One final tip is to make sure you only get "regular" taxa and not something
 # from a parataxonomy (like egg or footprint "species") with the pres= option
 # and the value "regular":
@@ -117,7 +121,7 @@ paste0("https://paleobiodb.org/data1.2/occs/list.csv?base_name=", Taxa,
 # Now we have a complete URL we can store it in a variable...:
 URL <- paste0("https://paleobiodb.org/data1.2/occs/list.csv?base_name=",
   Taxa, "&interval=", StartInterval, ",", StopInterval,
-  "&show=coords,paleoloc,class&pres=regular")
+  "&show=coords,paleoloc,class,strat&pres=regular")
 
 # ...and then use the read.csv function to read the data into R:
 RawData <- utils::read.csv(URL, header = TRUE, stringsAsFactors = FALSE)
@@ -130,7 +134,8 @@ head(RawData)
 
 # Note that you can do similar queries in packages such as velociraptr or
 # metatree, e.g.:
-VRData <- velociraptr::downloadPBDB(Taxa = Taxa, StartInterval = StartInterval, StopInterval = StopInterval)
+VRData <- velociraptr::downloadPBDB(Taxa = Taxa,
+  StartInterval = StartInterval, StopInterval = StopInterval)
 MTData <- metatree::PaleobiologyDBOccurrenceQuerier(unlist(lapply(apply(
   metatree::PaleobiologyDBChildFinder("1", Taxa, interval = c(StartInterval,
   StopInterval), returnrank = "3"), 1, list), function(x) {x <-
@@ -138,7 +143,7 @@ MTData <- metatree::PaleobiologyDBOccurrenceQuerier(unlist(lapply(apply(
   "", unname(x[!is.na(x)][1]))})))
 
 # But here we will stick with manual use of the API as it gives us more
-# options/control of the output.
+# options/control over the output.
 #
 # Importantly, you should never take a raw data query like these and use it
 # without some kind of scrutiny. But first we will simply trim away some of
@@ -146,7 +151,7 @@ MTData <- metatree::PaleobiologyDBOccurrenceQuerier(unlist(lapply(apply(
 RawData <- RawData[, c("occurrence_no", "collection_no", "phylum", "class",
   "order", "family", "genus", "accepted_name", "early_interval",
   "late_interval", "max_ma", "min_ma", "lng", "lat", "paleolng",
-  "paleolat", "identified_rank")]
+  "paleolat", "identified_rank", "formation")]
 
 # We have already excluded egg and trace fossils ("form taxa" in the language
 # of the PBDB), but we also have a bunch of fossils that are only assignable
@@ -164,7 +169,7 @@ nrow(RawData)
 
 # Another important issue to consider is that synonymisation of taxa in the
 # PBDB can lead to separate entries with the same name (as junior synonyms are
-# replaced with their senior counterparts. If you want to know about richness
+# replaced with their senior counterparts). If you want to know about richness
 # this is an issue, as it artificially inflates your estimate.
 #
 # We can stop this from happening by stripping out combinations of the same
@@ -176,7 +181,7 @@ RawData <- dplyr::distinct(RawData, accepted_name, collection_no,
 nrow(RawData)
 
 # Next we will consider occurrences not assigned to the stage(s) we want to
-# use as out time bins, but first we need to explicitly state what these are:
+# use as our time bins, but first we need to explicitly state what these are:
 StageNames <- c("Capitanian", "Wuchiapingian", "Changhsingian", "Induan",
   "Olenekian", "Anisian")
 
@@ -184,14 +189,14 @@ StageNames <- c("Capitanian", "Wuchiapingian", "Changhsingian", "Induan",
 # use later for (e.g.) plots:
 StageMidpoints <- c(263.1, 257, 253.2, 251.7, 249.2, 244.6)
 
-# Now we can use this information to only retain occurrences assigned to
+# Now we can use this information to only retain occurrences assigned to a
 # *single* one of our named stages with:
 RawData <- dplyr::filter(RawData, nchar(late_interval) == 0) %>%
   dplyr::filter(early_interval %in% StageNames)
 
 # Note that we are doing this in a simple, automated fashion, which loses
 # lots of occurrences unnecessarily, such as those dated to a single substage
-# or regional biozone and only do so here for ease.
+# or regional biozone, and only do so here for speed/ease.
 #
 # We can now extract clean data (the genus names for each fossil occurrence)
 # as vectors for each stage and store them as a list:
@@ -206,23 +211,38 @@ names(CleanData) <- StageNames
 # the Induan):
 CleanData[["Induan"]]
 
-# Note that this is a small list as these are the occurrences from the first
+# Note that this is a smaller list as these are the occurrences from the first
 # stage after the Permo-Traissic extinction. Things are not looking good for
 # our bivalves.
 #
 # We can do a simple (face value) diversity curve with:
 plot(x = StageMidpoints, y = unlist(lapply(CleanData, function(x)
-  length(unique(x)))), xlab = "Time (Ma)", ylab = "Richness (N genera)",
+  length(unique(x)))), xlab = "Time (Ma)", ylab = "Genus richness",
   type = "l", xlim = c(max(StageMidpoints), min(StageMidpoints)))
 
 # The Permo-Triassic extinction appears pretty evident, as are the early
-# stages of recovery. Next we can look at how much of this pattern may be
-# down to sampling bias (see other scripts).
+# stages of recovery. But is this just sampling bias? What if we also look
+# at the total numbers of occurrences or formations alongside genus richness?
+#
+# We can do that with:
+par(mfrow = c(3, 1))
+plot(x = StageMidpoints, y = unlist(lapply(CleanData, function(x)
+  length(unique(x)))), xlab = "Time (Ma)", ylab = "Genus richness",
+  type = "l", xlim = c(max(StageMidpoints), min(StageMidpoints)),
+  main = "Genus richness")
+plot(x = StageMidpoints, y = unlist(lapply(as.list(StageNames),
+  function(x) sum(RawData[, "early_interval"] == x))), xlab = "Time (Ma)",
+  ylab = "N occurrences", type = "l", xlim = c(max(StageMidpoints),
+  min(StageMidpoints)), main = "Number of occurrences")
+plot(x = StageMidpoints, y = unlist(lapply(as.list(StageNames),
+  function(x) {UniqueFormations <-
+  unique(RawData[RawData[, "early_interval"] == x, "formation"]);
+  length(UniqueFormations[nchar(UniqueFormations) > 0])})),
+  xlab = "Time (Ma)", ylab = "N formations", type = "l",
+  xlim = c(max(StageMidpoints), min(StageMidpoints)),
+  main = "Number of formations")
 
-
-
-# TO DO:
-# Occurrences through time
-# N formations through time
-
-
+# There seesm to be enough co-variance in these values to give us some concern
+# about sampling's role in explaining our data. In the next two scripts we will
+# explore ways to attempt to remove samplig from the equation to see if the
+# extinction plus recovery pattern holds up.
