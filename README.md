@@ -5,8 +5,6 @@ A workshop on sampling bias for the Progressive Palaeontology 2020 conference.
 Bethany Allen, Alex Dunhill and Graeme Lloyd
 
 # Resources
-Link to the Google Doc
-https://docs.google.com/document/d/1qcvRaOIkBRDdG3dvco6amFj6tyhLrb1_8u7CPC7pZJM/edit?ts=5e9d71cd
 
 Link to Graeme's slides
 https://docs.google.com/presentation/d/1gBbQTGRhejkAmWhyMDbV42IkM5-6k9YpYvUPJXUKaPE/edit#slide=id.p
@@ -34,7 +32,7 @@ The second is a discussion of what sampling bias means for palaeontologists who 
 # Running the practicals
 To run the practicals, start R (or RStudio, if you have installed it). Using 'Open' at the top left of either program, open the script you want to run; they are numbered in their recommended order.
 
-You will then need to tell R where to find your files by setting the working directory. This is a file path to the folder where you downloaded the workshop materials. The function is
+All of our scripts have been written to download data directly from the Paleobiology Database, so you shouldn't need to worry about where you've saved your files. However, if you do wish to use pre-saved data, you will need to tell R where to find them by setting the working directory. This is a file path to the folder where you downloaded the workshop materials. The function is
 
 setwd("[write your file path here]")
 
@@ -42,7 +40,7 @@ If you don't get an error message, it has probably worked (this is true for usin
 
 Start running the script line-by-line in the console. A # indicates a comment - that's for you to read, not the computer. We have tried to be extensive in our explanations of what is happening in the code to help you understand the processes.
 
-We will be holding a live Q&A session as part of the conference to answer any questions - please see the abstract booklet for more information.
+We will be holding a live Q&A session as part of the conference to answer any questions - this will be at 2pm BST on Friday 12th June. Delegates will have a Zoom link to the session emailed to them.
 
 # Further reading
 Raup 1972 (www.jstor.org/stable/1734207): One of the most famous papers in macroevolution, this is the first attempt at producing a diversity curve for the whole Phanerozoic. This paper is where a lot of core ideas relating to models and subsampling were laid out.
@@ -78,3 +76,5 @@ Dunhill et al. 2018 (https://doi.org/10.1111/pala.12331): A simulation-based stu
 Stadler et al. 2018 (https://doi.org/10.1016/j.jtbi.2018.03.005), Hopkins et al. 2018 (https://doi.org/10.1017/pab.2018.27) and Warnock et al. 2020 (https://doi.org/10.1017/pab.2020.12): Papers considering the role of sampling on our understanding of phylogenies and evolutionary processes, introducing and advocating for use of the fossilised birth-death model.
 
 Kocsis et al. 2019 (https://doi.org/10.1111/2041-210X.13161): The paper outlining divDyn, an R package containing a comprehensive suite of functions for analysing data in the Paleobiology Database.
+
+Allen et al. 2020 (https://doi.org/10.1098/rspb.2020.1125): An example of applying and comparing SQS and squares, across both spatial and temporal bins, specifically to look at the impact of the end-Permian mass extinction on the latitudinal diversity gradient of tetrapods.
