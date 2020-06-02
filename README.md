@@ -1,5 +1,5 @@
 # Sampling Bias workshop
-A workshop on sampling bias for the Progressive Palaeontology 2020 conference.
+A workshop on sampling bias in the fossil record for the Progressive Palaeontology 2020 conference.
 
 # Authors
 Bethany Allen, Alex Dunhill and Graeme Lloyd
@@ -77,4 +77,4 @@ Stadler et al. 2018 (https://doi.org/10.1016/j.jtbi.2018.03.005), Hopkins et al.
 
 Kocsis et al. 2019 (https://doi.org/10.1111/2041-210X.13161): The paper outlining divDyn, an R package containing a comprehensive suite of functions for analysing data in the Paleobiology Database.
 
-Allen et al. 2020 (https://doi.org/10.1098/rspb.2020.1125): An example of applying and comparing SQS and squares, across both spatial and temporal bins, specifically to look at the impact of the end-Permian mass extinction on the latitudinal diversity gradient of tetrapods.
+Allen et al. 2020 (in press; https://doi.org/10.1098/rspb.2020.1125): An example of applying and comparing SQS and squares, across both spatial and temporal bins, specifically to look at the impact of the end-Permian mass extinction on the latitudinal diversity gradient of tetrapods.
