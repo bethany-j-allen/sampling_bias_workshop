@@ -32,7 +32,7 @@ StageMidpoints <- c(263.1, 257, 253.2, 251.7, 249.2, 244.6)
 RawData <- dplyr::filter(RawData, nchar(late_interval) == 0) %>%
   dplyr::filter(early_interval %in% StageNames)
 
-# In Script Two you were introduced to rarefaction and bootstrapping, which are
+# In Script II we were introduced to rarefaction and bootstrapping, which are
 # fairly simplistic ways of estimating diversity in deep time. Now we introduce
 # coverage-based methods, which use strings of rank-order abundance to try and
 # estimate sampling completeness, and this informs the degree of extrapolation
@@ -48,8 +48,9 @@ RawData <- dplyr::filter(RawData, nchar(late_interval) == 0) %>%
 # subsampling at different degrees of sampling completeness, or 'quorum
 # levels', and estimates diversity using a metric called Good's u. Here we will
 # use iNEXT, which estimates diversity using Hill numbers via both subsampling
-# and extrapolation, using the equations of Chao and Jost (2012). This
-# subsampling method has been shown to be analogous to SQS (Close et al. 2018).
+# using the equations of Chao and Jost (2012). This subsampling method has been
+# shown to be analogous to SQS (Close et al. 2018). iNEXT also implements
+# extrapolation, using the Chao1 estimator (Hsieh et al. 2016).
 
 # First we generate a table of occurrences by stage:
 totals <- dplyr::count(RawData, early_interval)
@@ -186,9 +187,9 @@ ggplot(estD_list, aes(x = midpoints, y = qD, ymin = qD.LCL, ymax = qD.UCL, group
 ####################################
 ## (2) Squares
 # Squares is an extrapolator developed by Alroy (2018). It is also a
-# coverage-based approach which has been shown to perform well when the rank
-# abundance distributions of samples are particularly strongly skewed (i.e.
-# many rare taxa, as is often the case with fossil data) (Alroy 2018, 2020).
+# coverage-based approach which performs well when the rank abundance
+# distributions of samples are particularly strongly skewed (i.e. many
+# rare taxa, as is often the case with fossil data) (Alroy 2018, 2020).
 # We use the equation as stated by Alroy (2018) to generate our diversity
 # estimates.
 #
@@ -289,10 +290,6 @@ ggplot(to_plot, aes(x = StageMidpoints, y = squares_list)) +
   geom_vline(aes(xintercept = 242), colour = "grey") + #End of Anisian
   theme_classic()
 
-# Most of the code in this script was developed from the supplement from
-# Bethany's upcoming paper (Allen et al. 2020, The latitudinal diversity
-# gradient of tetrapods across the Permo-Triassic mass extinction and recovery
-# interval, Proc. Roy. Soc. B).
 #
 # There are a multitude of other methods available for estimating evolutionary
 # parameters whilst taking sampling into account. If you want to know more, we
