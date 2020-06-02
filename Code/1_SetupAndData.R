@@ -2,6 +2,8 @@
 #                                                                              #
 #                SCRIPT I - SETUP AND GETTING PBDB DATA INTO R                 #
 #                                                                              #
+#                     Graeme T. Lloyd and Bethany J. Allen                     #
+#                                                                              #
 ################################################################################
 
 # SCRIPT AIMS:

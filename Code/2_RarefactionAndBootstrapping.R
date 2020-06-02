@@ -2,6 +2,8 @@
 #                                                                              #
 #                   SCRIPT II - RAREFACTION AND BOOTSTRAPPING                  #
 #                                                                              #
+#                                Graeme T. Lloyd                               #
+#                                                                              #
 ################################################################################
 
 # SCRIPT AIMS:
