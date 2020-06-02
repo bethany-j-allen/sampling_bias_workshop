@@ -21,32 +21,33 @@ devtools::install_github("graemetlloyd/metatree")
 for(pkg in c(PackageBundle, "metatree")) try(library(pkg,
   character.only = TRUE), silent = TRUE)
 
-# If you are familiar with R then you will know the hardest part in using a
+# If you are familiar with R then you will know the hardest part of using a
 # package or script is to get your data into R in the format required by the
 # functions you want to use. Here we are going to take advantage of the
 # Paleobiology Database's "API" (short for Application Programming Interface),
-# which lets us "download" data directly into R. We are also going to use as
-# an example data set Permo-Triassic bivalves.
+# which lets us "download" data directly into R. We are going to use Permo-
+# Triassic bivalves as an example data set.
+#
 #
 # We can begin by setting up some variables:
 Taxa <- "Bivalvia" # Set "Taxa" as the taxonomic group of interest
 StartInterval <- "Capitanian" # Set start interval for sampling window
 StopInterval <- "Anisian" # Set stop interval for sampling window
 
-# In case you want to alter these to your own purposes then you should also
-# run the following lines which will ensure things get fromatted properly
+# In case you want to alter these for your own purposes then you should also
+# run the following lines which will ensure things get formatted properly
 # for use with the API:
 Taxa <- paste(Taxa, collapse = ",")
 StartInterval <- gsub(" ", "%20", StartInterval)
 StopInterval <- gsub(" ", "%20", StopInterval)
 
-# We are now ready to use the API, but to do we have to produce a formatted
-# URL (Uniform Resource Locator; i.e., a web address).
+# We are now ready to use the API, but to do that we have to produce a
+# formatted URL (Uniform Resource Locator; i.e., a web address).
 #
 # These will always begin with:
 "https://paleobiodb.org/data1.2"
 
-# This is simply the top-level of the database with data1.2 indicating we
+# This is simply the top-level of the database with 'data1.2' indicating we
 # are using version 1.2 (the latest version) of the API. Next we want the
 # type of query, here we want some fossil occurrences (which is what most
 # queries are going to be). Here we are going to ask for them as a CSV
@@ -55,8 +56,8 @@ StopInterval <- gsub(" ", "%20", StopInterval)
 
 # It is important to note that this means R will assume any comma it finds
 # in the output represents a division between columns of data. This means
-# if any of the data fields we want output contain a comma things are going
-# to break and hence why other formats (e.g., JSON) are also available).
+# if any of the data fields we want to output contain a comma things are going
+# to break and hence why other formats (e.g., JSON) are also available.
 # Here we should be fine though.
 #
 # Next we need to tell the database what taxon we actually want data for, so
@@ -72,11 +73,11 @@ utils::browseURL("https://paleobiodb.org/classic/basicTaxonInfo?taxon_no=291933"
 utils::browseURL("https://paleobiodb.org/classic/basicTaxonInfo?taxon_no=34920")
 
 # Thus if we ask the database for Glyptolepis the response from the database
-# might not be what you expect. Let's skip ahead and ask for this data to
+# might not be what we expect. Let's skip ahead and ask for this data to
 # see what happens:
 utils::read.csv("https://paleobiodb.org/data1.2/occs/list.csv?base_name=Glyptolepis&show=coords,paleoloc,class&limit=all", header = T, na.strings = "")
 
-# Instead of an error message (there are two Glyptotlepises!) the API just
+# Instead of an error message (there are two Glyptolepises!) the API just
 # goes with one of them (the plant). Note this is not happening because
 # there are no occurrences of the fish in the database. We can check that
 # this is true by asking for the "right" Glyptolepis (at least if you are a
@@ -86,7 +87,7 @@ utils::read.csv("https://paleobiodb.org/data1.2/occs/list.csv?taxon_id=34920&sho
 
 # Thus if you *really* want to be sure you are getting the data you want you
 # should use taxon_id= and the taxon number, and not base_name= and the taxon
-# name. Again, with nrachiopods we are OK, but remember that the ICZN and
+# name. Again, with bivalves we are OK, but remember that the ICZN and
 # ICBN are separate entities so there is nothing to stop someone naming a
 # group of plants Bivalvia!
 #
@@ -100,7 +101,7 @@ paste0("https://paleobiodb.org/data1.2/occs/list.csv?base_name=", Taxa,
 # Note that the start and end of the interval have to be separated by a comma.
 #
 # We can now add some additional options for what we want the output to include
-# with show=. If you want multiple things, again, these must be seoarated by
+# with show=. If you want multiple things, again, these must be separated by
 # commas. Here we will ask for coordinate data (coords), palaeo-locality data
 # (paleoloc), taxonomic hierarchy data (class) and stratigraphic information
 # (strat):
@@ -146,8 +147,11 @@ MTData <- metatree::PaleobiologyDBOccurrenceQuerier(unlist(lapply(apply(
 # options/control over the output.
 #
 # Importantly, you should never take a raw data query like these and use it
-# without some kind of scrutiny. But first we will simply trim away some of
-# the database fields (columns) we don't really need:
+# without some kind of scrutiny. There could be all sorts of mistakes or
+# things you don't intend in the dataset.
+#
+# First we will simply trim the database fields (columns) to the ones we 
+# really want:
 RawData <- RawData[, c("occurrence_no", "collection_no", "phylum", "class",
   "order", "family", "genus", "accepted_name", "early_interval",
   "late_interval", "max_ma", "min_ma", "lng", "lat", "paleolng",
@@ -173,7 +177,8 @@ nrow(RawData)
 # this is an issue, as it artificially inflates your estimate.
 #
 # We can stop this from happening by stripping out combinations of the same
-# collection no. AND accepted name.
+# collection number (a collection is somewhat analogous to a fossil locality)
+# and accepted name.
 RawData <- dplyr::distinct(RawData, accepted_name, collection_no,
   .keep_all = TRUE)
 
@@ -185,8 +190,8 @@ nrow(RawData)
 StageNames <- c("Capitanian", "Wuchiapingian", "Changhsingian", "Induan",
   "Olenekian", "Anisian")
 
-# Whilst we are at it we will also create a vector of stage midpoints we can
-# use later for (e.g.) plots:
+# Whilst we are at it we will also create a vector of stage midpoints (in Mya,
+# millions of years ago) we can use later for (e.g.) plots:
 StageMidpoints <- c(263.1, 257, 253.2, 251.7, 249.2, 244.6)
 
 # Now we can use this information to only retain occurrences assigned to a
@@ -198,8 +203,8 @@ RawData <- dplyr::filter(RawData, nchar(late_interval) == 0) %>%
 # lots of occurrences unnecessarily, such as those dated to a single substage
 # or regional biozone, and only do so here for speed/ease.
 #
-# We can now extract clean data (the genus names for each fossil occurrence)
-# as vectors for each stage and store them as a list:
+# We can now extract clean data, in the form of the genus names for each fossil
+# occurrence for each stage, as vectors and store them as a list:
 CleanData <- lapply(as.list(StageNames), function(x)
   {unlist(lapply(strsplit(RawData[RawData[, "early_interval"] == x,
   "genus"], split = " "), function(y) y[1]))})
@@ -211,9 +216,14 @@ names(CleanData) <- StageNames
 # the Induan):
 CleanData[["Induan"]]
 
-# Note that this is a smaller list as these are the occurrences from the first
+# Note that this is a small list as these are the occurrences from the first
 # stage after the Permo-Traissic extinction. Things are not looking good for
 # our bivalves.
+
+# This type of data is known as sampled-in-bin, as it only reflects the fossils
+# found in each stage, as opposed to ranged-through data, which fills in ghost
+# ranges (gaps in a taxon's stratigraphic range between its first and last
+# known occurrences).
 #
 # We can do a simple (face value) diversity curve with:
 plot(x = StageMidpoints, y = unlist(lapply(CleanData, function(x)
@@ -242,7 +252,7 @@ plot(x = StageMidpoints, y = unlist(lapply(as.list(StageNames),
   xlim = c(max(StageMidpoints), min(StageMidpoints)),
   main = "Number of formations")
 
-# There seesm to be enough co-variance in these values to give us some concern
+# There seems to be enough co-variance in these values to give us some concern
 # about sampling's role in explaining our data. In the next two scripts we will
-# explore ways to attempt to remove samplig from the equation to see if the
-# extinction plus recovery pattern holds up.
+# explore ways to attempt to remove sampling from the equation to see if the
+# extinction and recovery patterns holds up.
