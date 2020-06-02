@@ -59,6 +59,8 @@ Benton et al. 2011 (https://doi.org/10.1144/SP358.6): A review paper on sampling
 
 Benson & Upchurch 2013 (https://doi.org/10.1130/G33543.1): One of the first papers to illustrate the importance of understanding, and differentiating between, spatial and temporal aspects of sampling bias.
 
+Silvestro et al. 2014 (https://doi.org/10.1111/2041-210X.12263) and Silvestro et al. 2019 (https://doi.org/10.1017/pab.2019.23): Papers outlining the program PyRate, which estimates speciation, extinction, and preservation rates from fossil occurrence data using a Bayesian framework.
+
 Hsieh et al. 2016 (https://doi.org/10.1111/2041-210X.12613): The paper outlining iNEXT, one of the R packages we use here. The paper discusses the mechanisms used by the package, the assumptions made about the data put into it, and gives examples of how the package produces subsampled and extrapolated estimates of diversity.
 
 Starrfelt & Liow 2016 (https://doi.org/10.1098/rstb.2015.0219): The first paper to estimate diversity from the fossil record using TRiPS (True Richness estimated using a Poisson Sampling model).
