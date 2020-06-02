@@ -177,8 +177,8 @@ nrow(RawData)
 # this is an issue, as it artificially inflates your estimate.
 #
 # We can stop this from happening by stripping out combinations of the same
-# collection number (a collection is somewhat analogous to a fossil locality)
-# and accepted name.
+# accepted name and collection number (a collection is somewhat analogous to a
+# fossil locality; we will revisit this in greater detail in Script II).
 RawData <- dplyr::distinct(RawData, accepted_name, collection_no,
   .keep_all = TRUE)
 
