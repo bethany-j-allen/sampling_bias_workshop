@@ -140,10 +140,10 @@ head(RawData)
 VRData <- velociraptr::downloadPBDB(Taxa = Taxa,
   StartInterval = StartInterval, StopInterval = StopInterval)
 MTData <- metatree::PaleobiologyDBOccurrenceQuerier(unlist(lapply(apply(
-  metatree::PaleobiologyDBChildFinder("1", Taxa, interval = c(StartInterval,
-  StopInterval), returnrank = "3"), 1, list), function(x) {x <-
-  unlist(x)[c("OriginalTaxonNo", "ResolvedTaxonNo")]; gsub("txn:|var:",
-  "", unname(x[!is.na(x)][1]))})))
+  metatree::PaleobiologyDBDescendantFinder("1", Taxa,
+  interval = c(StartInterval, StopInterval), returnrank = "3"), 1, list),
+  function(x) {x <- unlist(x)[c("OriginalTaxonNo", "ResolvedTaxonNo")];
+  gsub("txn:|var:", "", unname(x[!is.na(x)][1]))})))
 
 # But here we will stick with manual use of the API as it gives us more
 # options/control over the output.
