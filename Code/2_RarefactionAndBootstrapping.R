@@ -10,7 +10,7 @@
 # 2. Learn hot to rarefy and bootstrap data in R.
 # 3. Generate rarefied and bootstrapped richness estimates.
 
-# Make sure the packages are loaded into memory...:
+# Make sure the packages we downloaded in Script I are loaded into memory...:
 PackageBundle <- c("devtools", "earth", "iNEXT", "metatree", "nlme", "paleoTS",
   "plotrix", "praise", "tidyverse", "velociraptr", "viridis")
 for(pkg in c(PackageBundle, "metatree")) try(library(pkg,
@@ -49,7 +49,7 @@ names(CleanData) <- StageNames
 # called "sample". We can see what this does if just give it the numbers 1:10:
 base::sample(1:10)
 
-# You shoudl see it basically "shuffles" them. try running it a few times to
+# You should see it basically "shuffles" them. Try running it a few times to
 # confirm that the answer will vary:
 base::sample(1:10)
 base::sample(1:10)
@@ -117,7 +117,7 @@ MultiReSampler <- function(NamesVector, NReplicates) apply(do.call(rbind,
   lapply(as.list(1:NReplicates),
   function(x) ReSampler(NamesVector)["NUnique", ])), 2, mean)
 
-# ...and test it out 100 times:
+# ...and test it out 100 times (or iterations):
 MultiReSamples <- MultiReSampler(NamesVector = CleanData[["Induan"]],
   NReplicates = 100)
 MultiReSamples
@@ -134,7 +134,7 @@ MultiReSamples <- MultiReSampler(NamesVector = CleanData[["Anisian"]],
 plot(x = 1:length(MultiReSamples), y = MultiReSamples, xlab = "N Occurrences",
   ylab = "Genus richness (N unique genera)", type = "l")
 
-# You should se this is a much larger sample (x-axis extends to much higher
+# You should see this is a much larger sample (x-axis extends to much higher
 # values). But also that the shape of the curve is now much clearer and appears
 # to be asymptoting (i.e. it gets less steep fom left to right). Now let's
 # produce a plot where we use all our stages so we can see the various
@@ -154,7 +154,7 @@ legend("topleft", legend = StageNames, col = viridis::viridis(length(StageNames)
 
 # You should be able to see that the curves for each stage are at least
 # slightly different, with the Induan and Olenekian falling below the other
-# stages (indicating they are genuinely less genus rich). We can the use this
+# stages (indicating they are genuinely less genus rich). We can then use this
 # data to pick an "equal" sampling level (N occurrences) across which diversity
 # can be compared. Let's try 100 occurrences and plot our diversity curve next
 # to our rarefaction curves to aid understanding of how things are working:
@@ -185,7 +185,8 @@ points(x = StageMidpoints, y = unlist(lapply(MultiReSamples,
 # This gives us an idea of how rarefaction works and how it can be used to
 # (notionally) set a level sampling playing field by only considering the
 # number of genera expected from a specific number of fossil occurrences.
-#
+
+
 # Bootstrapping works in a very similar way to rarefaction and we will consider
 # this next by first revisiting our sample function:
 base::sample(1:10)
@@ -197,7 +198,7 @@ base::sample(1:10, replace = FALSE)
 # What happens if instead we set this to true:
 base::sample(1:10, replace = TRUE)
 
-# We can again run this a few times to see waht is happening:
+# We can again run this a few times to see what is happening:
 base::sample(1:10, replace = TRUE)
 base::sample(1:10, replace = TRUE)
 base::sample(1:10, replace = TRUE)
@@ -261,17 +262,18 @@ points(x = StageMidpoints, y = unlist(lapply(MultiReSamples,
 # resampling with rarefaction after 100 fossils are sampled we will always end
 # up with 25 genera. However, with bootstrapping, because some genera may not
 # be part of the resample, after 100 fossils are sampled we could have less
-# than 25 genera. Generally, speaking this could be seen as a more desirable
+# than 25 genera. Generally speaking, this could be seen as a more desirable
 # property as it better reflects the types of uncertanity inherent to fossil
 # data. However, in terms of subsampling richness data we are better off using
-# the more sophisticated coverage metrics such as SQS and squares.
+# the more sophisticated coverage-based metrics such as SQS and squares, which
+# we will explore in Script III.
 #
 # We can, however, use bootstrapping in a more sophsticated way by resampling
 # not indiviudal fossil occurrences but individual fossil collections, and
 # then counting the genera in the collections you have sampled.
 #
 # A "collection" in the Paleobiology Database is not well defined, but in
-# theory represents a set of fossils collected from a single temporospatial
+# theory represents a set of fossils collected from a single spatio-temporal
 # locality. (In practice the way these are entered can vary *a lot*!) Here is
 # an example from within our data set:
 utils::browseURL("https://paleobiodb.org/classic/displayCollResults?a=basicCollectionSearch&collection_no=197722")
@@ -290,7 +292,7 @@ CollectionsList <- lapply(as.list(unique(RawData[, "collection_no"])),
 # Each value in the list thus looks something like this:
 CollectionsList[[1]]
 
-# So what we want to do now is (for each geologic stage) randomly sample
+# So what we want to do now is, for each geologic stage, randomly sample
 # from the available collections of that age and record the number of
 # unique genera we find.
 #
@@ -312,7 +314,7 @@ unique(unlist(lapply(CollectionsList[base::sample(which(unlist(lapply(
   CollectionsList, function(x) x$CollectionStage == "Induan"))),
   replace = TRUE)], function(y) y$CollectionGenera)))
 
-# However, if we are going to repat this for all stages we also need to set a
+# However, if we are going to repeat this for all stages we also need to set a
 # sampling level (number of collections). One of the useful things about
 # bootstrapping is that we are not constrained by the size of the sample, if
 # we are happy to sample collections multiple times then we can sample more
