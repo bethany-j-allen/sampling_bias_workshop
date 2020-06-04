@@ -11,9 +11,9 @@ Download R by choosing your local CRAN mirror here: https://cran.r-project.org/m
 
 Download R Studio here: https://rstudio.com/products/rstudio/download/#download
 
-We will only cover enough basic R here to allow new users to complete the practicals. If you want to learn more about R, we recommend the textbook "Getting Started with R: an introduction for biologists" by Andrew Beckerman, Dylan Childs and Owen Petchley.
+We will only cover enough basic R here to allow new users to complete the practicals. If you want to learn more about R, we recommend the textbook "Getting Started with R: An Introduction for Biologists" by Andrew Beckerman, Dylan Childs and Owen Petchley.
 
-To access the workshop files, click the green "Clone or download" button at the top right of this page, and select "Download ZIP". Once downloaded, open the folder by right-clicking and selecting "Extract all", saving the files somewhere you can access them - you will have to tell R where the files are when you start the practicals.
+To access the workshop files, click the green "Clone or download" button at the top right of this page, and select "Download ZIP". Once downloaded, open the folder by right-clicking and selecting "Extract all", saving the files somewhere you can access them.
 
 If you have your own GitHub account, you may want to keep your own copy of this repository by 'forking' it, again via the relevant button at the top right of this page.
 
@@ -27,7 +27,7 @@ The second is a discussion of what sampling bias means for palaeontologists who 
 # Running the practicals
 To run the practicals, start R (or RStudio, if you have installed it). Using 'Open' at the top left of either program, open the script you want to run; they are numbered in their recommended order.
 
-All of our scripts have been written to download data directly from the Paleobiology Database, so you shouldn't need to worry about where you've saved your files. However, if you do wish to use pre-saved data, you will need to tell R where to find them by setting the working directory. This is a file path to the folder where you downloaded the workshop materials. The function is
+All of our scripts have been written to download data directly from the Paleobiology Database, so you shouldn't need to worry too much about where you've saved your files. However, if you do wish to use pre-saved data, you will need to tell R where to find them by setting the working directory. This is a file path to the folder where you downloaded the workshop materials. The function is
 
 setwd("[write your file path here]")
 
