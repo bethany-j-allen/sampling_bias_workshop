@@ -151,7 +151,25 @@ MTData <- metatree::PaleobiologyDBOccurrenceQuerier(unlist(lapply(apply(
 # Importantly, you should never take a raw data query like these and use it
 # without some kind of scrutiny. There could be all sorts of mistakes or
 # things you don't intend in the dataset.
-#
+
+# It's good practice to save your download for posterity. First you will need
+# to set a working directory - this tells R where to save your file (and look
+# for files you want to load into R). This requires a file path to the folder
+# you want to use, e.g. to save to the desktop in Windows you would use:
+setwd("C:/Users/PCname/Desktop")
+# You can find the file path of a folder by looking at its properties, but
+# make sure you use forward slashes ( / ) and the same capitalisation. If
+# you run this line and get no response in the console, it has worked.
+
+# You can easily save a .csv using:
+write.csv(RawData, file = "PT_bivalves.csv")
+# The text in quotes specifies the file name.
+
+# If you want to pull this saved dataset back into R at a later date, you
+# can use:
+RawData <- read.csv("PT_bivalves.csv")
+
+# So, now to actually start manipulating our dataset.
 # First we will simply trim the database fields (columns) to the ones we 
 # really want:
 RawData <- RawData[, c("occurrence_no", "collection_no", "phylum", "class",
