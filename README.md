@@ -31,8 +31,6 @@ All of our scripts have been written to download data directly from the Paleobio
 
 setwd("[write your file path here]")
 
-If you don't get an error message, it has probably worked (this is true for using R generally). In this case, you're good to go! If not, try again, checking for spelling mistakes and consistent capitalisation.
-
 Start running the script line-by-line in the console. A # indicates a comment - that's for you to read, not the computer. We have tried to be extensive in our explanations of what is happening in the code to help you understand the processes.
 
 We will be holding a live Q&A session as part of the conference to answer any questions - this will be at 2pm BST on Friday 12th June. Delegates will have a Zoom link to the session emailed to them.
