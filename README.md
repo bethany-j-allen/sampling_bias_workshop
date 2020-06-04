@@ -1,5 +1,5 @@
-# Sampling Bias workshop
-A workshop on sampling bias in the fossil record for the Progressive Palaeontology 2020 conference.
+# Sampling Bias in the Fossil Record
+A workshop developed for Progressive Palaeontology 2020.
 
 # Authors
 Bethany Allen, Alex Dunhill and Graeme Lloyd
