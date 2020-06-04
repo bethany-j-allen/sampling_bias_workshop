@@ -27,7 +27,7 @@ The second is a discussion of what sampling bias means for palaeontologists who 
 # Running the practicals
 To run the practicals, start R (or RStudio, if you have installed it). Using 'Open' at the top left of either program, open the script you want to run; they are numbered in their recommended order.
 
-All of our scripts have been written to download data directly from the Paleobiology Database, so you shouldn't need to worry too much about where you've saved your files. However, if you do wish to use saved data, you will need to tell R where to find the files by setting the working directory. This is briefly covered in Script I.
+All of our scripts have been written to download data directly from the Paleobiology Database, so you shouldn't need to worry too much about where you've saved your files. However, if you do wish to use saved data, you will need to tell R where to find the files by setting the working directory. This is briefly covered in Script 1.
 
 Start running the script line-by-line in the console. A # indicates a comment - that's for you to read, not the computer. We have tried to be extensive in our explanations of what is happening in the code to help you understand the processes.
 
