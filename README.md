@@ -4,11 +4,6 @@ A workshop on sampling bias in the fossil record for the Progressive Palaeontolo
 # Authors
 Bethany Allen, Alex Dunhill and Graeme Lloyd
 
-# Resources
-
-Link to Graeme's slides
-https://docs.google.com/presentation/d/1gBbQTGRhejkAmWhyMDbV42IkM5-6k9YpYvUPJXUKaPE/edit#slide=id.p
-
 # Getting started
 This workshop is comprised of videos and practicals in R, a statistical programming language. In order to run the practicals, you will need to download and install R onto your computer. You may also want to install R Studio, a wrapper for R which organises your inputs and outputs into easy-to-see panels.
 
@@ -27,7 +22,7 @@ There are two video lectures associated with the workshop. We advise that you wa
 
 The first is an introduction to the sources of sampling bias in the fossil record, given by Dr. Alex Dunhill, and can be found here: https://www.youtube.com/watch?v=smfm6mR-obE (duration: 45 mins)
 
-The second is a discussion of what sampling bias means for palaeontologists who want to conduct quantitative analysis of the fossil record, given by Dr. Graeme Lloyd, and can be found here: 
+The second is a discussion of what sampling bias means for palaeontologists who want to conduct quantitative analysis of the fossil record, given by Dr. Graeme Lloyd, and can be found here: https://www.youtube.com/watch?v=oKK4dERKqFU (duration: 55 mins)
 
 # Running the practicals
 To run the practicals, start R (or RStudio, if you have installed it). Using 'Open' at the top left of either program, open the script you want to run; they are numbered in their recommended order.
