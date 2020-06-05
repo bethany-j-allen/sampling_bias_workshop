@@ -49,8 +49,8 @@ RawData <- dplyr::filter(RawData, nchar(late_interval) == 0) %>%
 # SQS (Alroy, 2010) uses rank-order abundance to estimate diversity through
 # subsampling at different degrees of sampling completeness, or 'quorum
 # levels', and estimates diversity using a metric called Good's u. Here we will
-# use iNEXT, which estimates diversity using Hill numbers via both subsampling
-# using the equations of Chao and Jost (2012). This subsampling method has been
+# use iNEXT, which estimates diversity using Hill numbers via subsampling
+# with the equations of Chao and Jost (2012). This subsampling method has been
 # shown to be analogous to SQS (Close et al. 2018). iNEXT also implements
 # extrapolation, using the Chao1 estimator (Hsieh et al. 2016).
 
