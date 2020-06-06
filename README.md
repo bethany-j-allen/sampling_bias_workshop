@@ -11,7 +11,7 @@ This workshop is comprised of videos and practicals in R, a statistical programm
 
 Download R by choosing your local CRAN mirror here: https://cran.r-project.org/mirrors.html
 
-Download R Studio here: https://rstudio.com/products/rstudio/download/#download
+Download RStudio here: https://rstudio.com/products/rstudio/download/#download
 
 We will only cover enough basic R here to allow new users to complete the practicals. If you want to learn more about R, we recommend the textbook "Getting Started with R: An Introduction for Biologists" by Andrew Beckerman, Dylan Childs and Owen Petchley.
 
