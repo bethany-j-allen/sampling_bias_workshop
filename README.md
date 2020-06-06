@@ -4,8 +4,10 @@ A workshop developed for Progressive Palaeontology 2020.
 # Authors
 Bethany Allen, Alex Dunhill and Graeme Lloyd
 
+Palaeo@Leeds, School of Earth and Environment, University of Leeds, UK
+
 # Getting started
-This workshop is comprised of videos and practicals in R, a statistical programming language. In order to run the practicals, you will need to download and install R onto your computer. You may also want to install R Studio, a wrapper for R which organises your inputs and outputs into easy-to-see panels.
+This workshop is comprised of videos and practicals in R, a statistical programming language. In order to run the practicals, you will need to download and install R onto your computer. You may also want to install RStudio, a wrapper for R which organises your inputs and outputs into easy-to-see panels.
 
 Download R by choosing your local CRAN mirror here: https://cran.r-project.org/mirrors.html
 
