@@ -70,6 +70,6 @@ Dunhill et al. 2018 (https://doi.org/10.1111/pala.12331): A simulation-based stu
 
 Stadler et al. 2018 (https://doi.org/10.1016/j.jtbi.2018.03.005), Hopkins et al. 2018 (https://doi.org/10.1017/pab.2018.27) and Warnock et al. 2020 (https://doi.org/10.1017/pab.2020.12): Papers considering the role of sampling on our understanding of phylogenies and evolutionary processes, introducing and advocating for use of the fossilised birth-death model.
 
-Kocsis et al. 2019 (https://doi.org/10.1111/2041-210X.13161): The paper outlining divDyn, an R package containing a comprehensive suite of functions for analysing data in the Paleobiology Database.
+Kocsis et al. 2019 (https://doi.org/10.1111/2041-210X.13161): The paper outlining divDyn, an R package containing a comprehensive suite of functions for analysing data from the Paleobiology Database.
 
 Allen et al. 2020 (in press; https://doi.org/10.1098/rspb.2020.1125): An example of applying and comparing SQS and squares, across both spatial and temporal bins, specifically to look at the impact of the end-Permian mass extinction on the latitudinal diversity gradient of tetrapods.
